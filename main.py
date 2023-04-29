@@ -34,6 +34,9 @@ async def navigate(
     browser: Optional[Browser] = None,
     page: Optional[Page] = None,
 ) -> Page:
+    if not page and not browser:
+        raise TypeError("Either 'browser' or 'page' must be provided")
+
     if page:
         await page.goto(url)
     else:
@@ -73,9 +76,6 @@ async def get_generation_urls(
     page: Page, urls_pokedex: list[str]
 ) -> list[str]:
     generations: list[str] = list()
-
-    # Navigate to Pokédexes page
-    page = await navigate(url=urls_pokedex[0], page=page)
 
     # Locate generations
     main: Locator = page.get_by_role("main")
@@ -128,9 +128,61 @@ async def main_routine(backend: Playwright) -> None:
     urls_pokedex: list[str] = await get_pokedex_urls(page)
     await dump_console_recording(CONSOLE, title="urls_pokedex")
 
-    # Follow Pokédex URL
+    # Get generation URLs
     _: list[str] = await get_generation_urls(page, urls_pokedex)
     await dump_console_recording(CONSOLE, title="urls_generations")
+
+    # TODO: Refactor this into coroutine function
+    # Follow Pokédex URL
+    # TODO: Loop over all Pokédexes and do below card extractions
+    page = await navigate(url=urls_pokedex[0], page=page)
+
+    # Pokémon grid
+    card_container: Locator = page.locator(".infocard-list").nth(0)
+    await expect(card_container).to_be_visible()
+
+    # Get card data
+    card_img_data: Locator = card_container.locator(".infocard-lg-img")
+    card_data: Locator = card_container.locator(".infocard-lg-data")
+
+    # Extract card image data
+    # TODO: Store data
+    for card in await card_img_data.all():
+        url: str = urljoin(
+            URL_ROOT,
+            await card.get_by_role("link").get_attribute("href"),
+        )
+        img_src: str | None = await card.get_by_role(
+            "img"
+        ).get_attribute("src")
+        img_alt: str | None = await card.get_by_role(
+            "img"
+        ).get_attribute("alt")
+
+        # Debug
+        CONSOLE.log("[bold]URL:", url)
+        CONSOLE.log("[bold]IMG SRC:", img_src)
+        CONSOLE.log("[bold]IMG ALT:", img_alt)
+
+    # Extract card data
+    # TODO: Store data
+    for card in await card_data.all():
+        number: str = await card.locator("small").first.inner_text()
+
+        types: Locator = (
+            card.locator("small").nth(1).get_by_role("link")
+        )
+
+        TYPES: list(str) = list()
+
+        for t in await types.all():
+            TYPES.append(await t.inner_text())
+
+        # Debug
+        CONSOLE.log("[bold]NUMBER:", number)
+        CONSOLE.log("[bold]TYPES:", "; ".join(TYPES))
+
+    # TODO: Follow URL from card_img_data and scrape all details
 
     # Teardown
     await teardown(browser)
