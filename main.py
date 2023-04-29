@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from sys import stdin
 from typing import List, Optional
 from urllib.parse import urljoin
 
@@ -17,6 +17,8 @@ import src as source
 # Setup
 __all__ = ["source"]
 CONSOLE = Console(record=True)
+
+KEEP_ALIVE = False
 
 # Globals
 URL_ROOT = "https://pokemondb.net"
@@ -44,14 +46,13 @@ async def get_pokedex_urls(page: Page) -> List[str]:
     await expect(main).to_be_visible()
 
     pokedexes = (
-        page.get_by_role("main")
-        .get_by_role("navigation")
+        main.get_by_role("navigation")
         .get_by_role("list")
         .nth(1)
         .get_by_role("listitem")
     )
 
-    # Extract URLs
+    # Extract and compile URLs
     for li in await pokedexes.all():
         pokedex = urljoin(
             URL_ROOT, await li.get_by_role("link").get_attribute("href")
@@ -61,17 +62,47 @@ async def get_pokedex_urls(page: Page) -> List[str]:
     return urls_pokedex
 
 
+async def get_generation_urls(page: Page, urls_pokedex: List[str]) -> List[str]:
+    generations: List[str] = list()
+
+    # Navigate to Pokédexes page
+    page = await navigate(url=urls_pokedex[0], page=page)
+    CONSOLE.log(await page.title())
+
+    # Locate generations
+    main = page.get_by_role("main")
+    await expect(main).to_be_visible()
+
+    links = main.get_by_role("list").get_by_role("link")
+
+    # Extract and compile URLs
+    for a in await links.all():
+        href = await a.get_attribute("href")
+        generations.append(urljoin(urls_pokedex[0], href))
+
+    return generations
+
+
 async def dump_console_recording(
     console: Console, title: Optional[str] = None
 ) -> None:
     console.save_svg(
-        path=f"./data/static/logs/{title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg",
+        path=f"./data/static/logs/{title}.svg",
         title=title.title(),
     )
 
 
 async def teardown(browser: Browser):
-    await browser.close()
+    if KEEP_ALIVE:
+        CONSOLE.log("Press CTRL-D to stop")
+        reader = asyncio.StreamReader()
+        pipe = stdin
+        loop = asyncio.get_event_loop()
+        await loop.connect_read_pipe(
+            lambda: asyncio.StreamReaderProtocol(reader), pipe
+        )
+    else:
+        await browser.close()
 
 
 async def main_routine(backend: Playwright):
@@ -88,8 +119,10 @@ async def main_routine(backend: Playwright):
     CONSOLE.log(urls_pokedex)
     await dump_console_recording(CONSOLE, title="urls_pokedex")
 
-    # Follow Pokédex URLs
-    page = await navigate(url=urls_pokedex[0], page=page)
+    # Follow Pokédex URL
+    urls_generations = await get_generation_urls(page, urls_pokedex)
+    CONSOLE.log(urls_generations)
+    await dump_console_recording(CONSOLE, title="urls_generations")
 
     # Teardown
     await teardown(browser)
