@@ -1,6 +1,6 @@
 from pathlib import Path
 
-FOLDERS = ["data/static/img", "data/static/logs"]
+FOLDERS: list[str] = ["data/static/img", "data/static/logs"]
 
 
 def create_env() -> None:
