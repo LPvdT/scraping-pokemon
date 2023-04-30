@@ -373,13 +373,14 @@ async def main_routine(backend: Playwright) -> None:
     # Base stats #
     ##############
     db_base_stats = dict(
-        hp=list(),
-        attack=list(),
-        defense=list(),
-        special_attack=list(),
-        special_defense=list(),
-        speed=list(),
+        hp=dict(),
+        attack=dict(),
+        defense=dict(),
+        special_attack=dict(),
+        special_defense=dict(),
+        speed=dict(),
     )
+    db_base_stats_record_keys = ["base", "min", "max"]
 
     # Extract
     locator_base_stats = page.locator(".vitals-table").nth(3)
@@ -387,13 +388,74 @@ async def main_routine(backend: Playwright) -> None:
 
     array_base_stats = await locator_base_stats_row.all_inner_texts()
 
-    CONSOLE.log(array_base_stats)
-
     # Parse
+    _hp_data = array_base_stats[0].strip().split("\t")
+    _hp_data.remove("\n")
+    _hp_data.pop(0)
+
+    _attack_data = array_base_stats[1].strip().split("\t")
+    _attack_data.remove("\n")
+    _attack_data.pop(0)
+
+    _defense_data = array_base_stats[2].strip().split("\t")
+    _defense_data.remove("\n")
+    _defense_data.pop(0)
+
+    _special_attack_data = array_base_stats[3].strip().split("\t")
+    _special_attack_data.remove("\n")
+    _special_attack_data.pop(0)
+
+    _special_defense_data = array_base_stats[4].strip().split("\t")
+    _special_defense_data.remove("\n")
+    _special_defense_data.pop(0)
+
+    _speed_data = array_base_stats[5].strip().split("\t")
+    _speed_data.remove("\n")
+    _speed_data.pop(0)
+
+    CONSOLE.log(
+        _hp_data,
+        _attack_data,
+        _defense_data,
+        _special_attack_data,
+        _special_defense_data,
+        _speed_data,
+    )
 
     # Store
+    db_base_stats["hp"] = {
+        key: int(value)
+        for (key, value) in zip(db_base_stats_record_keys, _hp_data)
+    }
+    db_base_stats["attack"] = {
+        key: int(value)
+        for (key, value) in zip(db_base_stats_record_keys, _attack_data)
+    }
+    db_base_stats["defense"] = {
+        key: int(value)
+        for (key, value) in zip(
+            db_base_stats_record_keys, _defense_data
+        )
+    }
+    db_base_stats["special_attack"] = {
+        key: int(value)
+        for (key, value) in zip(
+            db_base_stats_record_keys, _special_attack_data
+        )
+    }
+    db_base_stats["special_defense"] = {
+        key: int(value)
+        for (key, value) in zip(
+            db_base_stats_record_keys, _special_defense_data
+        )
+    }
+    db_base_stats["speed"] = {
+        key: int(value)
+        for (key, value) in zip(db_base_stats_record_keys, _speed_data)
+    }
 
     # Debug
+    CONSOLE.log(db_base_stats)
 
     ###################
     # Pokédex entries #
