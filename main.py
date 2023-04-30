@@ -460,35 +460,51 @@ async def main_routine(backend: Playwright) -> None:
     ###################
     # Pokédex entries #
     ###################
-    db = ...
+    db_pokedex_entries = dict(game=list(), entry=list())
 
     # Extract
-    page.locator(".vitals-table").nth(4)
+    locator_pokedex_entries = page.locator(".vitals-table").nth(4)
+    locator_pokedex_entries_row = locator_pokedex_entries.get_by_role(
+        "row"
+    )
 
-    # Parse
+    array_pokedex_entries: List[
+        str
+    ] = await locator_pokedex_entries_row.all_inner_texts()
 
-    # Store
+    for record in array_pokedex_entries:
+        # Parse
+        _game_data, _entry_data = record.strip().split("\t")
+        _game_data, _entry_data = normalize(
+            "NFKC", _game_data
+        ), normalize("NFKC", _entry_data)
+        _game_data = _game_data.split("\n")
+
+        # Store
+        db_pokedex_entries["game"].append(_game_data)
+        db_pokedex_entries["entry"].append(_entry_data)
 
     # Debug
+    CONSOLE.log(db_pokedex_entries)
 
-    #################
-    # Where to find #
-    #################
-    db = ...
+    # #################
+    # # Where to find #
+    # #################
+    # db = ...
 
-    # Extract
-    page.locator(".vitals-table").nth(5)
+    # # Extract
+    # page.locator(".vitals-table").nth(5)
 
-    # Parse
+    # # Parse
 
-    # Store
+    # # Store
 
-    # Debug
+    # # Debug
 
-    ###################
-    # Other languages #
-    ###################
-    page.locator(".vitals-table").nth(6)
+    # ###################
+    # # Other languages #
+    # ###################
+    # page.locator(".vitals-table").nth(6)
 
     # TODO: Type defenses
     # TODO: Evolution chart
