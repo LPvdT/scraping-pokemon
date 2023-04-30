@@ -234,7 +234,9 @@ async def main_routine(backend: Playwright) -> None:
 
     CONSOLE.log(description)
 
-    # Pokédex data
+    ################
+    # Pokédex data #
+    ################
     db_pokedex_data = dict(
         national_no=list(),
         type=list(),
@@ -245,53 +247,156 @@ async def main_routine(backend: Playwright) -> None:
         local_no=list(),
     )
 
+    # Extract
     locator_pokedex_data: Locator = page.locator(".vitals-table").nth(0)
-    locator_row: Locator = locator_pokedex_data.get_by_role("row")
-
-    array_pokedex_data: List[str] = await locator_row.all_inner_texts()
-
-    _, _national_no_data = array_pokedex_data[0].strip().split("\t")
-    _, _type_data = array_pokedex_data[1].strip().split("\t")
-    _, _species_data = array_pokedex_data[2].strip().split("\t")
-    _, _height_data = array_pokedex_data[3].strip().split("\t")
-    _, _weight_data = array_pokedex_data[4].strip().split("\t")
-    _, _abilities_data = array_pokedex_data[5].strip().split("\t")
-    _, _local_no_data = array_pokedex_data[6].strip().split("\t")
-
-    db_pokedex_data["national_no"].append(
-        normalize("NFKC", _national_no_data)
-    )
-    db_pokedex_data["type"].append(
-        normalize("NFKC", _type_data).split()
-    )
-    db_pokedex_data["species"].append(normalize("NFKC", _species_data))
-    db_pokedex_data["height"].append(normalize("NFKC", _height_data))
-    db_pokedex_data["weight"].append(normalize("NFKC", _weight_data))
-    db_pokedex_data["abilities"].append(
-        normalize("NFKC", _abilities_data).split("\n")
-    )
-    db_pokedex_data["local_no"].append(
-        normalize("NFKC", _local_no_data).split("\n")
+    locator_pokedex_data_row: Locator = (
+        locator_pokedex_data.get_by_role("row")
     )
 
+    array_pokedex_data: List[
+        str
+    ] = await locator_pokedex_data_row.all_inner_texts()
+
+    # Parse
+    _, _national_no_data = normalize(
+        "NFKC", array_pokedex_data[0].strip().split("\t")
+    )
+    _, _type_data = normalize(
+        "NFKC", array_pokedex_data[1].strip().split("\t")
+    )
+    _, _species_data = normalize(
+        "NFKC", array_pokedex_data[2].strip().split("\t")
+    )
+    _, _height_data = normalize(
+        "NFKC", array_pokedex_data[3].strip().split("\t")
+    )
+    _, _weight_data = normalize(
+        "NFKC", array_pokedex_data[4].strip().split("\t")
+    )
+    _, _abilities_data = normalize(
+        "NFKC", array_pokedex_data[5].strip().split("\t")
+    ).split("\n")
+    _, _local_no_data = normalize(
+        "NFKC", array_pokedex_data[6].strip().split("\t")
+    ).split("\n")
+
+    # Store
+    db_pokedex_data["national_no"].append(_national_no_data)
+    db_pokedex_data["type"].append(_type_data)
+    db_pokedex_data["species"].append(_species_data)
+    db_pokedex_data["height"].append(_height_data)
+    db_pokedex_data["weight"].append(_weight_data)
+    db_pokedex_data["abilities"].append(_abilities_data)
+    db_pokedex_data["local_no"].append(_local_no_data)
+
+    # Debug
     CONSOLE.log(db_pokedex_data)
 
-    # Training
-    page.locator(".vitals-table").nth(1)
+    ############
+    # Training #
+    ############
+    db_training = dict(
+        ev_yield=list(),
+        catch_rate=list(),
+        base_friendship=list(),
+        base_exp=list(),
+        growth_rate=list(),
+    )
 
-    # Breeding
+    # Extract
+    locator_training = page.locator(".vitals-table").nth(1)
+    locator_training_row = locator_training.get_by_role("row")
+
+    array_training: List[
+        str
+    ] = await locator_training_row.all_inner_texts()
+
+    # Parse
+    _, _ev_yield_data = normalize(
+        "NFKC", array_training[0].strip().split("\t")
+    )
+    _, _catch_rate_data = normalize(
+        "NFKC", array_training[1].strip().split("\t")
+    )
+    _, _base_friendship_data = normalize(
+        "NFKC", array_training[2].strip().split("\t")
+    )
+    _, _base_exp_data = normalize(
+        "NFKC", array_training[3].strip().split("\t")
+    )
+    _, _growth_rate_data = normalize(
+        "NFKC", array_training[4].strip().split("\t")
+    )
+
+    # Store
+    db_training["ev_yield"].append(_ev_yield_data)
+    db_training["catch_rate"].append(_catch_rate_data)
+    db_training["base_friendship"].append(_base_friendship_data)
+    db_training["base_exp"].append(_base_exp_data)
+    db_training["growth_rate"].append(_growth_rate_data)
+
+    # Debug
+    CONSOLE.log(db_training)
+
+    ############
+    # Breeding #
+    ############
+    db = ...
+
+    # Extract
     page.locator(".vitals-table").nth(2)
 
-    # Base stats
+    # Parse
+
+    # Store
+
+    # Debug
+
+    ##############
+    # Base stats #
+    ##############
+    db = ...
+
+    # Extract
     page.locator(".vitals-table").nth(3)
 
-    # Pokédex entries
+    # Parse
+
+    # Store
+
+    # Debug
+
+    ###################
+    # Pokédex entries #
+    ###################
+    db = ...
+
+    # Extract
     page.locator(".vitals-table").nth(4)
 
-    # Where to find
+    # Parse
+
+    # Store
+
+    # Debug
+
+    #################
+    # Where to find #
+    #################
+    db = ...
+
+    # Extract
     page.locator(".vitals-table").nth(5)
 
-    # Other languages
+    # Parse
+
+    # Store
+
+    # Debug
+
+    ###################
+    # Other languages #
+    ###################
     page.locator(".vitals-table").nth(6)
 
     # TODO: Type defenses
