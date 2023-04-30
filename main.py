@@ -258,27 +258,26 @@ async def main_routine(backend: Playwright) -> None:
     ] = await locator_pokedex_data_row.all_inner_texts()
 
     # Parse
-    _, _national_no_data = normalize(
-        "NFKC", array_pokedex_data[0].strip().split("\t")
-    )
-    _, _type_data = normalize(
-        "NFKC", array_pokedex_data[1].strip().split("\t")
-    )
-    _, _species_data = normalize(
-        "NFKC", array_pokedex_data[2].strip().split("\t")
-    )
-    _, _height_data = normalize(
-        "NFKC", array_pokedex_data[3].strip().split("\t")
-    )
-    _, _weight_data = normalize(
-        "NFKC", array_pokedex_data[4].strip().split("\t")
-    )
-    _, _abilities_data = normalize(
-        "NFKC", array_pokedex_data[5].strip().split("\t")
-    ).split("\n")
-    _, _local_no_data = normalize(
-        "NFKC", array_pokedex_data[6].strip().split("\t")
-    ).split("\n")
+    _, _national_no_data = array_pokedex_data[0].strip().split("\t")
+    _national_no_data = normalize("NFKC", _national_no_data)
+
+    _, _type_data = array_pokedex_data[1].strip().split("\t")
+    _type_data = normalize("NFKC", _type_data)
+
+    _, _species_data = array_pokedex_data[2].strip().split("\t")
+    _species_data = normalize("NFKC", _species_data)
+
+    _, _height_data = array_pokedex_data[3].strip().split("\t")
+    _height_data = normalize("NFKC", _height_data)
+
+    _, _weight_data = array_pokedex_data[4].strip().split("\t")
+    _weight_data = normalize("NFKC", _weight_data)
+
+    _, _abilities_data = array_pokedex_data[5].strip().split("\t")
+    _abilities_data = normalize("NFKC", _abilities_data).split("\n")
+
+    _, _local_no_data = array_pokedex_data[6].strip().split("\t")
+    _local_no_data = normalize("NFKC", _local_no_data).split("\n")
 
     # Store
     db_pokedex_data["national_no"].append(_national_no_data)
@@ -312,21 +311,20 @@ async def main_routine(backend: Playwright) -> None:
     ] = await locator_training_row.all_inner_texts()
 
     # Parse
-    _, _ev_yield_data = normalize(
-        "NFKC", array_training[0].strip().split("\t")
-    )
-    _, _catch_rate_data = normalize(
-        "NFKC", array_training[1].strip().split("\t")
-    )
-    _, _base_friendship_data = normalize(
-        "NFKC", array_training[2].strip().split("\t")
-    )
-    _, _base_exp_data = normalize(
-        "NFKC", array_training[3].strip().split("\t")
-    )
-    _, _growth_rate_data = normalize(
-        "NFKC", array_training[4].strip().split("\t")
-    )
+    _, _ev_yield_data = array_training[0].strip().split("\t")
+    _ev_yield_data = normalize("NFKC", _ev_yield_data)
+
+    _, _catch_rate_data = array_training[1].strip().split("\t")
+    _catch_rate_data = normalize("NFKC", _catch_rate_data)
+
+    _, _base_friendship_data = array_training[2].strip().split("\t")
+    _base_friendship_data = normalize("NFKC", _base_friendship_data)
+
+    _, _base_exp_data = array_training[3].strip().split("\t")
+    _base_exp_data = normalize("NFKC", _base_exp_data)
+
+    _, _growth_rate_data = array_training[4].strip().split("\t")
+    _growth_rate_data = normalize("NFKC", _growth_rate_data)
 
     # Store
     db_training["ev_yield"].append(_ev_yield_data)
@@ -354,15 +352,14 @@ async def main_routine(backend: Playwright) -> None:
     ] = await locator_breeding_row.all_inner_texts()
 
     # Parse
-    _, _egg_groups_data = normalize(
-        "NFKC", array_breeding[0].strip().split("\t")
-    )
-    _, _gender_data = normalize(
-        "NFKC", array_breeding[1].strip().split("\t")
-    )
-    _, _egg_cycles_data = normalize(
-        "NFKC", array_breeding[2].strip().split("\t")
-    )
+    _, _egg_groups_data = array_breeding[0].strip().split("\t")
+    _egg_groups_data = normalize("NFKC", _egg_groups_data).split(",")
+
+    _, _gender_data = array_breeding[1].strip().split("\t")
+    _gender_data = normalize("NFKC", _gender_data)
+
+    _, _egg_cycles_data = array_breeding[2].strip().split("\t")
+    _egg_cycles_data = normalize("NFKC", _egg_cycles_data)
 
     # Store
     db_breeding["egg_groups"].append(_egg_groups_data)
@@ -375,10 +372,22 @@ async def main_routine(backend: Playwright) -> None:
     ##############
     # Base stats #
     ##############
-    db = ...
+    db_base_stats = dict(
+        hp=list(),
+        attack=list(),
+        defense=list(),
+        special_attack=list(),
+        special_defense=list(),
+        speed=list(),
+    )
 
     # Extract
-    page.locator(".vitals-table").nth(3)
+    locator_base_stats = page.locator(".vitals-table").nth(3)
+    locator_base_stats_row = locator_base_stats.get_by_role("row")
+
+    array_base_stats = await locator_base_stats_row.all_inner_texts()
+
+    CONSOLE.log(array_base_stats)
 
     # Parse
 
