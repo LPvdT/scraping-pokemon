@@ -487,24 +487,63 @@ async def main_routine(backend: Playwright) -> None:
     # Debug
     CONSOLE.log(db_pokedex_entries)
 
-    # #################
-    # # Where to find #
-    # #################
-    # db = ...
+    #################
+    # Where to find #
+    #################
+    db_where_to_find = dict(game=list(), location=list())
 
-    # # Extract
-    # page.locator(".vitals-table").nth(5)
+    # Extract
+    locator_where_to_find = page.locator(".vitals-table").nth(5)
+    locator_where_to_find_row = locator_where_to_find.get_by_role("row")
 
-    # # Parse
+    array_where_to_find: List[
+        str
+    ] = await locator_where_to_find_row.all_inner_texts()
 
-    # # Store
+    for record in array_where_to_find:
+        # Parse
+        _game_data, _location_data = record.strip().split("\t")
+        _game_data, _location_data = normalize(
+            "NFKC", _game_data
+        ), normalize("NFKC", _location_data)
+        _game_data = _game_data.split("\n")
 
-    # # Debug
+        # Store
+        db_where_to_find["game"].append(_game_data)
+        db_where_to_find["location"].append(_location_data)
 
-    # ###################
-    # # Other languages #
-    # ###################
-    # page.locator(".vitals-table").nth(6)
+    # Debug
+    CONSOLE.log(db_where_to_find)
+
+    ###################
+    # Other languages #
+    ###################
+    db_other_languages = dict(language=list(), name=list())
+
+    # Extract
+    locator_other_languages = page.locator(".vitals-table").nth(6)
+    locator_other_languages_row = locator_other_languages.get_by_role(
+        "row"
+    )
+
+    array_other_languages: List[
+        str
+    ] = await locator_other_languages_row.all_inner_texts()
+
+    for record in array_other_languages:
+        # Parse
+        _language_data, _name_data = record.strip().split("\t")
+        _language_data, _name_data = normalize(
+            "NFKC", _language_data
+        ), normalize("NFKC", _name_data)
+        _language_data = _language_data.split("\n")
+
+        # Store
+        db_other_languages["language"].append(_language_data)
+        db_other_languages["name"].append(_name_data)
+
+    # Debug
+    CONSOLE.log(db_other_languages)
 
     # TODO: Type defenses
     # TODO: Evolution chart
