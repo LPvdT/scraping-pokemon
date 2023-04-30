@@ -19,7 +19,7 @@ import src as source
 __all__: List[str] = ["source"]
 
 # Setup
-CONSOLE = Console(record=True)
+CONSOLE = Console(record=True, tab_size=4)
 
 KEEP_ALIVE = False
 FIREFOX_PARAMS = dict(headless=False, timeout=5000)
