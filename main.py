@@ -1,21 +1,22 @@
 import asyncio
 from sys import stdin
-from typing import Optional, TextIO
+from typing import List, Literal, Optional, TextIO
+from unicodedata import normalize
 from urllib.parse import urljoin
 
 from playwright.async_api import (
     Browser,
+    Locator,
     Page,
     Playwright,
     async_playwright,
     expect,
-    Locator,
 )
 from rich.console import Console
 
 import src as source
 
-__all__: list[str] = ["source"]
+__all__: List[str] = ["source"]
 
 # Setup
 CONSOLE = Console(record=True)
@@ -48,53 +49,62 @@ async def navigate(
     return page
 
 
-async def get_pokedex_urls(page: Page) -> list[str]:
-    urls_pokedex: list[str] = list()
+async def get_pokedex_urls(page: Page) -> List[str]:
+    db_urls_pokedex: List[str] = list()
 
     # Locate Pokédexes list
-    main: Locator = page.get_by_role("main")
-    await expect(main).to_be_visible()
+    locator_main: Locator = page.get_by_role("main")
+    await expect(locator_main).to_be_visible()
 
-    pokedexes: Locator = (
-        main.get_by_role("navigation")
+    locator_pokedexes: Locator = (
+        locator_main.get_by_role("navigation")
         .get_by_role("list")
         .nth(1)
         .get_by_role("listitem")
     )
 
     # Extract and compile URLs
-    for li in await pokedexes.all():
+    for li in await locator_pokedexes.all():
         pokedex: str = urljoin(
             URL_ROOT, await li.get_by_role("link").get_attribute("href")
         )
-        urls_pokedex.append(pokedex)
+        db_urls_pokedex.append(pokedex)
 
-    return urls_pokedex
+    return db_urls_pokedex
 
 
 async def get_generation_urls(
-    page: Page, urls_pokedex: list[str]
-) -> list[str]:
-    generations: list[str] = list()
+    page: Page, urls_pokedex: List[str]
+) -> List[str]:
+    generations: List[str] = list()
 
     # Locate generations
-    main: Locator = page.get_by_role("main")
-    await expect(main).to_be_visible()
+    locator_main: Locator = page.get_by_role("main")
+    await expect(locator_main).to_be_visible()
 
-    links: Locator = main.get_by_role("list").get_by_role("link")
+    locator_links: Locator = locator_main.get_by_role(
+        "list"
+    ).get_by_role("link")
 
     # Extract and compile URLs
-    for a in await links.all():
+    for a in await locator_links.all():
         href: str | None = await a.get_attribute("href")
         generations.append(urljoin(urls_pokedex[0], href))
 
     return generations
 
 
-async def dump_console_recording(console: Console, title: str) -> None:
-    console.save_svg(
+async def dump_console_recording(
+    console: Console, title: str, type: Literal["svg", "html"]
+) -> None:
+    params = dict(
         path=f"./data/static/logs/{title}.svg",
         title=title.title(),
+    )
+
+    console.save_svg(**params)
+    console.save_html(
+        **params.update(path=params["path"].replace(".svg", ".html"))
     )
 
 
@@ -118,71 +128,177 @@ async def main_routine(backend: Playwright) -> None:
     browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
     CONSOLE.log("Browser started! 😸")
 
-    # Follow entrypoint URL
-    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
+    # HACK: Skip coroutines for debug
+    if 1 == 0:
+        # Follow entrypoint URL
+        page: Page = await navigate(url=ENTRYPOINT, browser=browser)
 
-    # Show title
-    await dump_console_recording(CONSOLE, title="root_title")
+        # Show title
+        await dump_console_recording(CONSOLE, title="root_title")
 
-    # Get Pokédex URLs
-    urls_pokedex: list[str] = await get_pokedex_urls(page)
-    await dump_console_recording(CONSOLE, title="urls_pokedex")
+        # Get Pokédex URLs
+        urls_pokedex: List[str] = await get_pokedex_urls(page)
+        await dump_console_recording(CONSOLE, title="urls_pokedex")
 
-    # Get generation URLs
-    _: list[str] = await get_generation_urls(page, urls_pokedex)
-    await dump_console_recording(CONSOLE, title="urls_generations")
+        # Get generation URLs
+        _: List[str] = await get_generation_urls(page, urls_pokedex)
+        await dump_console_recording(CONSOLE, title="urls_generations")
 
-    # TODO: Refactor this into coroutine function
-    # Follow Pokédex URL
-    # TODO: Loop over all Pokédexes and do below card extractions
-    page = await navigate(url=urls_pokedex[0], page=page)
+        # TODO: Refactor this into coroutine function
+        # TODO: Loop over all Pokédexes and do below card extractions
 
-    # Pokémon grid
-    card_container: Locator = page.locator(".infocard-list").nth(0)
-    await expect(card_container).to_be_visible()
+        # Follow Pokédex URL
+        page = await navigate(url=urls_pokedex[0], page=page)
 
-    # Get card data
-    card_img_data: Locator = card_container.locator(".infocard-lg-img")
-    card_data: Locator = card_container.locator(".infocard-lg-data")
+        # Pokémon grid
+        locator_card_container: Locator = page.locator(
+            ".infocard-list"
+        ).nth(0)
+        await expect(locator_card_container).to_be_visible()
 
-    # Extract card image data
-    # TODO: Store data
-    for card in await card_img_data.all():
-        url: str = urljoin(
-            URL_ROOT,
-            await card.get_by_role("link").get_attribute("href"),
+        # Get card data
+        locator_card_img_data: Locator = locator_card_container.locator(
+            ".infocard-lg-img"
         )
-        img_src: str | None = await card.get_by_role(
-            "img"
-        ).get_attribute("src")
-        img_alt: str | None = await card.get_by_role(
-            "img"
-        ).get_attribute("alt")
-
-        # Debug
-        CONSOLE.log("[bold]URL:", url)
-        CONSOLE.log("[bold]IMG SRC:", img_src)
-        CONSOLE.log("[bold]IMG ALT:", img_alt)
-
-    # Extract card data
-    # TODO: Store data
-    for card in await card_data.all():
-        number: str = await card.locator("small").first.inner_text()
-
-        types: Locator = (
-            card.locator("small").nth(1).get_by_role("link")
+        locator_card_data: Locator = locator_card_container.locator(
+            ".infocard-lg-data"
         )
 
-        TYPES: list(str) = list()
+        # Extract card image data
+        db_card_image = dict(url=list(), img_src=list(), img_alt=list())
 
-        for t in await types.all():
-            TYPES.append(await t.inner_text())
+        for card in await locator_card_img_data.all():
+            url: str = urljoin(
+                URL_ROOT,
+                await card.get_by_role("link").get_attribute("href"),
+            )
+            img_src: str | None = await card.get_by_role(
+                "img"
+            ).get_attribute("src")
+            img_alt: str | None = await card.get_by_role(
+                "img"
+            ).get_attribute("alt")
 
-        # Debug
-        CONSOLE.log("[bold]NUMBER:", number)
-        CONSOLE.log("[bold]TYPES:", "; ".join(TYPES))
+            # Add to db
+            db_card_image["url"].append(url)
+            db_card_image["img_src"].append(img_src)
+            db_card_image["img_alt"].append(img_alt)
 
-    # TODO: Follow URL from card_img_data and scrape all details
+            # Debug
+            CONSOLE.log("[bold]URL:", url)
+            CONSOLE.log("[bold]IMG SRC:", img_src)
+            CONSOLE.log("[bold]IMG ALT:", img_alt)
+
+        # Extract card data
+        db_card_data = dict(number=list(), types=list())
+
+        for card in await locator_card_data.all():
+            number: str = await card.locator("small").first.inner_text()
+
+            locator_types: Locator = (
+                card.locator("small").nth(1).get_by_role("link")
+            )
+
+            types: list(str) = list()
+
+            for t in await locator_types.all():
+                types.append(await t.inner_text())
+
+            # Add to db
+            db_card_data["number"].append(number)
+            db_card_data["types"].append(types)
+
+            # Debug
+            CONSOLE.log("[bold]NUMBER:", number)
+            CONSOLE.log("[bold]TYPES:", "; ".join(types))
+
+        # TODO: Refactor to coroutine function
+        # TODO: Loop over all URLs from db_card_image
+        # TODO: Follow URL from card_img_data and scrape all details
+
+        # Example URL
+        _: str = db_card_image["url"][0]
+
+    # HACK: Eventually use URL from db_card_image["url"] and existing page object
+    page = await navigate(
+        url="https://pokemondb.net/pokedex/bulbasaur",
+        browser=browser
+        # page=page
+    )
+
+    # Description
+    locator_description: Locator = (
+        page.locator("main").locator("p").first
+    )
+    description: str = await locator_description.inner_text()
+
+    CONSOLE.log(description)
+
+    # Pokédex data
+    db_pokedex_data = dict(
+        national_no=list(),
+        type=list(),
+        species=list(),
+        height=list(),
+        weight=list(),
+        abilities=list(),
+        local_no=list(),
+    )
+
+    locator_pokedex_data: Locator = page.locator(".vitals-table").nth(0)
+    locator_row: Locator = locator_pokedex_data.get_by_role("row")
+
+    array_pokedex_data: List[str] = await locator_row.all_inner_texts()
+
+    _, _national_no_data = array_pokedex_data[0].strip().split("\t")
+    _, _type_data = array_pokedex_data[1].strip().split("\t")
+    _, _species_data = array_pokedex_data[2].strip().split("\t")
+    _, _height_data = array_pokedex_data[3].strip().split("\t")
+    _, _weight_data = array_pokedex_data[4].strip().split("\t")
+    _, _abilities_data = array_pokedex_data[5].strip().split("\t")
+    _, _local_no_data = array_pokedex_data[6].strip().split("\t")
+
+    db_pokedex_data["national_no"].append(
+        normalize("NFKC", _national_no_data)
+    )
+    db_pokedex_data["type"].append(
+        normalize("NFKC", _type_data).split()
+    )
+    db_pokedex_data["species"].append(normalize("NFKC", _species_data))
+    db_pokedex_data["height"].append(normalize("NFKC", _height_data))
+    db_pokedex_data["weight"].append(normalize("NFKC", _weight_data))
+    db_pokedex_data["abilities"].append(
+        normalize("NFKC", _abilities_data).split("\n")
+    )
+    db_pokedex_data["local_no"].append(
+        normalize("NFKC", _local_no_data).split("\n")
+    )
+
+    CONSOLE.log(db_pokedex_data)
+
+    # Training
+    page.locator(".vitals-table").nth(1)
+
+    # Breeding
+    page.locator(".vitals-table").nth(2)
+
+    # Base stats
+    page.locator(".vitals-table").nth(3)
+
+    # Pokédex entries
+    page.locator(".vitals-table").nth(4)
+
+    # Where to find
+    page.locator(".vitals-table").nth(5)
+
+    # Other languages
+    page.locator(".vitals-table").nth(6)
+
+    # TODO: Type defenses
+    # TODO: Evolution chart
+    # TODO: <Pokemon> changes
+    # TODO: Name origin
+    # TODO: Moves learned by <Pokémon>: Requires another loop; lot of work
 
     # Teardown
     await teardown(browser)
