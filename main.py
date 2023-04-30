@@ -341,16 +341,36 @@ async def main_routine(backend: Playwright) -> None:
     ############
     # Breeding #
     ############
-    db = ...
+    db_breeding = dict(
+        egg_groups=list(), gender=list(), egg_cycles=list()
+    )
 
     # Extract
-    page.locator(".vitals-table").nth(2)
+    locator_breeding = page.locator(".vitals-table").nth(2)
+    locator_breeding_row = locator_breeding.get_by_role("row")
+
+    array_breeding: List[
+        str
+    ] = await locator_breeding_row.all_inner_texts()
 
     # Parse
+    _, _egg_groups_data = normalize(
+        "NFKC", array_breeding[0].strip().split("\t")
+    )
+    _, _gender_data = normalize(
+        "NFKC", array_breeding[1].strip().split("\t")
+    )
+    _, _egg_cycles_data = normalize(
+        "NFKC", array_breeding[2].strip().split("\t")
+    )
 
     # Store
+    db_breeding["egg_groups"].append(_egg_groups_data)
+    db_breeding["gender"].append(_gender_data)
+    db_breeding["egg_cycles"].append(_egg_cycles_data)
 
     # Debug
+    CONSOLE.log(db_breeding)
 
     ##############
     # Base stats #
