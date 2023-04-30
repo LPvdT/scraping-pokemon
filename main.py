@@ -134,15 +134,21 @@ async def main_routine(backend: Playwright) -> None:
         page: Page = await navigate(url=ENTRYPOINT, browser=browser)
 
         # Show title
-        await dump_console_recording(CONSOLE, title="root_title")
+        await dump_console_recording(
+            CONSOLE, title="root_title", type="svg"
+        )
 
         # Get Pokédex URLs
         urls_pokedex: List[str] = await get_pokedex_urls(page)
-        await dump_console_recording(CONSOLE, title="urls_pokedex")
+        await dump_console_recording(
+            CONSOLE, title="urls_pokedex", type="svg"
+        )
 
         # Get generation URLs
         _: List[str] = await get_generation_urls(page, urls_pokedex)
-        await dump_console_recording(CONSOLE, title="urls_generations")
+        await dump_console_recording(
+            CONSOLE, title="urls_generations", type="svg"
+        )
 
         # TODO: Refactor this into coroutine function
         # TODO: Loop over all Pokédexes and do below card extractions
