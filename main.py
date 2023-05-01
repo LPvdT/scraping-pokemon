@@ -1,6 +1,15 @@
 import asyncio
+from pathlib import Path
 from sys import stdin
-from typing import List, Literal, Optional, TextIO, Tuple
+from typing import (
+    List,
+    Literal,
+    Optional,
+    TextIO,
+    Tuple,
+    TypedDict,
+    Union,
+)
 from unicodedata import normalize
 from urllib.parse import urljoin
 
@@ -16,6 +25,15 @@ from rich.console import Console
 
 import src as source
 
+
+class FirefoxParams(TypedDict):
+    headless: Literal[True, False]
+    timeout: Union[float, None]
+    slow_mo: Union[float, None]
+    downloads_path: Union[str, Path, None]
+    traces_dir: Union[str, Path, None]
+
+
 __all__: List[str] = ["source"]
 
 # Setup
@@ -23,7 +41,9 @@ CONSOLE = Console(record=True, tab_size=4)
 
 # Switches
 KEEP_ALIVE = False
-FIREFOX_PARAMS = dict(headless=False, timeout=5000)
+FIREFOX_PARAMS = FirefoxParams(headless=False, timeout=50, slow_mo=100)
+LIMIT_POKEDEX = 1
+LIMIT_CARDS = 5
 
 # URL
 URL_ROOT = "https://pokemondb.net"
@@ -107,13 +127,11 @@ async def get_pokedex_cards(
     db_pokedex_card_data: List[dict] = list()
 
     # HACK: Limit for debugging
-    limit_pokedex = 1
-
-    if limit_pokedex > 0:
-        urls_pokedex = urls_pokedex[:limit_pokedex]
+    if LIMIT_POKEDEX > 0:
+        urls_pokedex = urls_pokedex[:LIMIT_POKEDEX]
 
         CONSOLE.rule(
-            f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {limit_pokedex}"
+            f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_POKEDEX}"
         )
 
     for url in urls_pokedex:
@@ -138,15 +156,12 @@ async def get_pokedex_cards(
         card_data_all = await locator_card_data.all()
 
         # HACK: Limit for debugging
-        limit_cards = 1
-
-        if limit_cards > 0:
-            limit_cards = int(limit_cards * 5)
-            card_img_data_all = card_img_data_all[:limit_cards]
-            card_data_all = card_data_all[:limit_cards]
+        if LIMIT_CARDS > 0:
+            card_img_data_all = card_img_data_all[:LIMIT_CARDS]
+            card_data_all = card_data_all[:LIMIT_CARDS]
 
             CONSOLE.rule(
-                f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {limit_cards}"
+                f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_CARDS}"
             )
 
         for card_image, card_data in zip(
