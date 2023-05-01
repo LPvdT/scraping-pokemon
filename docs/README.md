@@ -2,7 +2,7 @@
 
 Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* library combined with asynchronous *Python*.
 
-# TODO
+# Todo
 
 ## Pokédex detail page
 
@@ -13,3 +13,12 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 - [ ] *Bulbasaur*changes
 - [ ] Name origin
 - [ ] Moves learned by *Bulbasaur*: Requires another loop; lot of work
+
+# Bugs
+
+## Pokédex detail page
+
+> [Example *Pikachu*](https://pokemondb.net/pokedex/pikachu)
+
+- [ ] Data below the table *Base stats* does not get scraped.
+  - Suggestion: Find tables in relation to position of the header (e.g. *Base stats*), in order to properly determine its location.
