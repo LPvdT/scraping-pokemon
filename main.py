@@ -45,7 +45,9 @@ async def navigate(
         page = await browser.new_page()
         await page.goto(url)
 
-    CONSOLE.log("[bold]Title:", await page.title())
+    # Log
+    CONSOLE.rule("[bold]Title:")
+    CONSOLE.log(await page.title())
 
     return page
 
@@ -105,11 +107,13 @@ async def get_pokedex_cards(
     db_pokedex_card_data: List[dict] = list()
 
     # HACK: Limit for debugging
-    limit = True
+    limit = 1
 
-    if limit:
-        CONSOLE.log("[bold]LIMIT:", "urls_pokedex limited to 1")
-        urls_pokedex = [urls_pokedex[0]]
+    if limit > 0:
+        CONSOLE.log(
+            "[bold red]LIMIT:", f"urls_pokedex limited to {limit + 1}"
+        )
+        urls_pokedex = [urls_pokedex[limit + 1]]
 
     for url in urls_pokedex:
         # Follow Pokédex URL
@@ -133,10 +137,13 @@ async def get_pokedex_cards(
         card_img_data_all = await locator_card_img_data.all()
         card_data_all = await locator_card_data.all()
 
-        if limit:
-            CONSOLE.log("[bold]LIMIT:", "card_data limited to 25")
-            card_img_data_all = card_img_data_all[:25]
-            card_data_all = card_data_all[:25]
+        if limit > 1:
+            CONSOLE.log(
+                "[bold red]LIMIT:",
+                f"card_data limited to {int(limit * 25)}",
+            )
+            card_img_data_all = card_img_data_all[: int(limit * 25)]
+            card_data_all = card_data_all[: int(limit * 25)]
 
         for card_image, card_data in zip(
             card_img_data_all, card_data_all
@@ -195,18 +202,18 @@ async def get_pokedex_cards(
             CONSOLE.log("[bold]NUMBER:", number)
             CONSOLE.log("[bold]TYPES:", "; ".join(types))
 
-        # Append to db
-        db_pokedex_card_image.append(db_card_image)
-        db_pokedex_card_data.append(db_card_data)
+            # Append to db
+            db_pokedex_card_image.append(db_card_image)
+            db_pokedex_card_data.append(db_card_data)
 
-    # HACK
-    CONSOLE.rule("[bold]db_pokedex_card_image")
-    CONSOLE.log(db_pokedex_card_image)
+        # HACK
+        CONSOLE.rule("[bold]db_pokedex_card_image")
+        CONSOLE.log(db_pokedex_card_image)
 
-    CONSOLE.rule("[bold]db_pokedex_card_data")
-    CONSOLE.log(db_pokedex_card_data)
+        CONSOLE.rule("[bold]db_pokedex_card_data")
+        CONSOLE.log(db_pokedex_card_data)
 
-    return db_pokedex_card_image, db_pokedex_card_data
+        return db_pokedex_card_image, db_pokedex_card_data
 
 
 async def dump_console_recording(
@@ -278,7 +285,8 @@ async def main_coroutine(backend: Playwright) -> None:
     # TODO: Refactor to coroutine function
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # HACK
-        CONSOLE.log("[bold]url_pokemon:", url_pokemon[0])
+        CONSOLE.rule("[bold]url_pokemon:")
+        CONSOLE.log(url_pokemon[0])
 
         # Navigate to Pokémon detail page
         page = await navigate(url=url_pokemon[0], page=page)
@@ -290,7 +298,8 @@ async def main_coroutine(backend: Playwright) -> None:
         description: str = await locator_description.inner_text()
 
         # HACK
-        CONSOLE.log("[bold]Description:", description)
+        CONSOLE.rule("[bold]Description:")
+        CONSOLE.log(description)
 
         ################
         # Pokédex data #
