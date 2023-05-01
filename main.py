@@ -21,10 +21,11 @@ __all__: List[str] = ["source"]
 # Setup
 CONSOLE = Console(record=True, tab_size=4)
 
+# Switches
 KEEP_ALIVE = False
 FIREFOX_PARAMS = dict(headless=False, timeout=5000)
 
-# Globals
+# URL
 URL_ROOT = "https://pokemondb.net"
 URL_POKEDEX_INDEX = "pokedex"
 ENTRYPOINT: str = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
@@ -50,6 +51,7 @@ async def navigate(
 
 
 async def get_pokedex_urls(page: Page) -> List[str]:
+    # Storage
     db_urls_pokedex: List[str] = list()
 
     # Locate Pokédexes list
@@ -76,7 +78,8 @@ async def get_pokedex_urls(page: Page) -> List[str]:
 async def get_generation_urls(
     page: Page, urls_pokedex: List[str]
 ) -> List[str]:
-    generations: List[str] = list()
+    # Storage
+    db_urls_generations: List[str] = list()
 
     # Locate generations
     locator_main: Locator = page.get_by_role("main")
@@ -89,16 +92,24 @@ async def get_generation_urls(
     # Extract and compile URLs
     for a in await locator_links.all():
         href: str | None = await a.get_attribute("href")
-        generations.append(urljoin(urls_pokedex[0], href))
+        db_urls_generations.append(urljoin(urls_pokedex[0], href))
 
-    return generations
+    return db_urls_generations
 
 
 async def get_pokedex_cards(
     page, urls_pokedex
 ) -> Tuple[List[dict], List[dict]]:
+    # Storage
     db_pokedex_card_image: List[dict] = list()
     db_pokedex_card_data: List[dict] = list()
+
+    # HACK: Limit for debugging
+    limit = True
+
+    if limit:
+        CONSOLE.log("[bold]LIMIT:", "urls_pokedex limited to 1")
+        urls_pokedex = [urls_pokedex[0]]
 
     for url in urls_pokedex:
         # Follow Pokédex URL
@@ -118,9 +129,17 @@ async def get_pokedex_cards(
             ".infocard-lg-data"
         )
 
+        # HACK: Limit for debugging
+        card_img_data_all = await locator_card_img_data.all()
+        card_data_all = await locator_card_data.all()
+
+        if limit:
+            CONSOLE.log("[bold]LIMIT:", "card_data limited to 25")
+            card_img_data_all = card_img_data_all[:25]
+            card_data_all = card_data_all[:25]
+
         for card_image, card_data in zip(
-            await locator_card_img_data.all(),
-            await locator_card_data.all(),
+            card_img_data_all, card_data_all
         ):
             # Storage
             db_card_image = dict(
@@ -148,6 +167,7 @@ async def get_pokedex_cards(
             db_card_image["img_alt"].append(img_alt)
 
             # HACK
+            CONSOLE.rule("[bold]card_image")
             CONSOLE.log("[bold]URL:", url)
             CONSOLE.log("[bold]IMG SRC:", img_src)
             CONSOLE.log("[bold]IMG ALT:", img_alt)
@@ -171,6 +191,7 @@ async def get_pokedex_cards(
             db_card_data["types"].append(types)
 
             # HACK
+            CONSOLE.rule("[bold]card_data")
             CONSOLE.log("[bold]NUMBER:", number)
             CONSOLE.log("[bold]TYPES:", "; ".join(types))
 
@@ -179,7 +200,10 @@ async def get_pokedex_cards(
         db_pokedex_card_data.append(db_card_data)
 
     # HACK
+    CONSOLE.rule("[bold]db_pokedex_card_image")
     CONSOLE.log(db_pokedex_card_image)
+
+    CONSOLE.rule("[bold]db_pokedex_card_data")
     CONSOLE.log(db_pokedex_card_data)
 
     return db_pokedex_card_image, db_pokedex_card_data
@@ -220,7 +244,7 @@ async def teardown(browser: Browser) -> None:
         await browser.close()
 
 
-async def main_routine(backend: Playwright) -> None:
+async def main_coroutine(backend: Playwright) -> None:
     # Launch browser and navigate
     browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
     CONSOLE.log("Browser started! 😸")
@@ -253,8 +277,11 @@ async def main_routine(backend: Playwright) -> None:
 
     # TODO: Refactor to coroutine function
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
+        # HACK
+        CONSOLE.log("[bold]url_pokemon:", url_pokemon[0])
+
         # Navigate to Pokémon detail page
-        page = await navigate(url=url_pokemon, page=page)
+        page = await navigate(url=url_pokemon[0], page=page)
 
         # Fetch description
         locator_description: Locator = (
@@ -263,7 +290,7 @@ async def main_routine(backend: Playwright) -> None:
         description: str = await locator_description.inner_text()
 
         # HACK
-        CONSOLE.log(description)
+        CONSOLE.log("[bold]Description:", description)
 
         ################
         # Pokédex data #
@@ -322,6 +349,7 @@ async def main_routine(backend: Playwright) -> None:
         db_pokedex_data["local_no"].append(_local_no_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_pokedex_data")
         CONSOLE.log(db_pokedex_data)
 
         ############
@@ -367,6 +395,7 @@ async def main_routine(backend: Playwright) -> None:
         db_training["growth_rate"].append(_growth_rate_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_training")
         CONSOLE.log(db_training)
 
         ############
@@ -402,6 +431,7 @@ async def main_routine(backend: Playwright) -> None:
         db_breeding["egg_cycles"].append(_egg_cycles_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_breeding")
         CONSOLE.log(db_breeding)
 
         ##############
@@ -450,16 +480,6 @@ async def main_routine(backend: Playwright) -> None:
         _speed_data.remove("\n")
         _speed_data.pop(0)
 
-        # HACK
-        CONSOLE.log(
-            _hp_data,
-            _attack_data,
-            _defense_data,
-            _special_attack_data,
-            _special_defense_data,
-            _speed_data,
-        )
-
         # Store
         db_base_stats["hp"] = {
             key: int(value)
@@ -497,6 +517,7 @@ async def main_routine(backend: Playwright) -> None:
         }
 
         # HACK
+        CONSOLE.rule("[bold]db_base_stats")
         CONSOLE.log(db_base_stats)
 
         ###################
@@ -527,6 +548,7 @@ async def main_routine(backend: Playwright) -> None:
             db_pokedex_entries["entry"].append(_entry_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_pokedex_entries")
         CONSOLE.log(db_pokedex_entries)
 
         #################
@@ -557,6 +579,7 @@ async def main_routine(backend: Playwright) -> None:
             db_where_to_find["location"].append(_location_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_where_to_find")
         CONSOLE.log(db_where_to_find)
 
         ###################
@@ -587,6 +610,7 @@ async def main_routine(backend: Playwright) -> None:
             db_other_languages["name"].append(_name_data)
 
         # HACK
+        CONSOLE.rule("[bold]db_other_languages")
         CONSOLE.log(db_other_languages)
 
     # Teardown
@@ -595,7 +619,7 @@ async def main_routine(backend: Playwright) -> None:
 
 async def entrypoint() -> None:
     async with async_playwright() as backend:
-        await main_routine(backend)
+        await main_coroutine(backend)
 
 
 if __name__ == "__main__":
