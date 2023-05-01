@@ -1,6 +1,6 @@
 import asyncio
 from sys import stdin
-from typing import List, Literal, Optional, TextIO
+from typing import List, Literal, Optional, TextIO, Tuple
 from unicodedata import normalize
 from urllib.parse import urljoin
 
@@ -94,6 +94,97 @@ async def get_generation_urls(
     return generations
 
 
+async def get_pokedex_cards(
+    page, urls_pokedex
+) -> Tuple[List[dict], List[dict]]:
+    db_pokedex_card_image: List[dict] = list()
+    db_pokedex_card_data: List[dict] = list()
+
+    for url in urls_pokedex:
+        # Follow Pokédex URL
+        page = await navigate(url=url, page=page)
+
+        # Pokémon grid
+        locator_card_container: Locator = page.locator(
+            ".infocard-list"
+        ).nth(0)
+        await expect(locator_card_container).to_be_visible()
+
+        # Get card data
+        locator_card_img_data: Locator = locator_card_container.locator(
+            ".infocard-lg-img"
+        )
+        locator_card_data: Locator = locator_card_container.locator(
+            ".infocard-lg-data"
+        )
+
+        for card_image, card_data in zip(
+            await locator_card_img_data.all(),
+            await locator_card_data.all(),
+        ):
+            # Storage
+            db_card_image = dict(
+                url=list(), img_src=list(), img_alt=list()
+            )
+            db_card_data = dict(number=list(), types=list())
+
+            # Extract card image data
+            url: str = urljoin(
+                URL_ROOT,
+                await card_image.get_by_role("link").get_attribute(
+                    "href"
+                ),
+            )
+            img_src: str | None = await card_image.get_by_role(
+                "img"
+            ).get_attribute("src")
+            img_alt: str | None = await card_image.get_by_role(
+                "img"
+            ).get_attribute("alt")
+
+            # Add to db
+            db_card_image["url"].append(url)
+            db_card_image["img_src"].append(img_src)
+            db_card_image["img_alt"].append(img_alt)
+
+            # HACK
+            CONSOLE.log("[bold]URL:", url)
+            CONSOLE.log("[bold]IMG SRC:", img_src)
+            CONSOLE.log("[bold]IMG ALT:", img_alt)
+
+            # Extract card data
+            number: str = await card_data.locator(
+                "small"
+            ).first.inner_text()
+
+            locator_types: Locator = (
+                card_data.locator("small").nth(1).get_by_role("link")
+            )
+
+            types: list(str) = list()
+
+            for t in await locator_types.all():
+                types.append(await t.inner_text())
+
+            # Add to db
+            db_card_data["number"].append(number)
+            db_card_data["types"].append(types)
+
+            # HACK
+            CONSOLE.log("[bold]NUMBER:", number)
+            CONSOLE.log("[bold]TYPES:", "; ".join(types))
+
+        # Append to db
+        db_pokedex_card_image.append(db_card_image)
+        db_pokedex_card_data.append(db_card_data)
+
+    # HACK
+    CONSOLE.log(db_pokedex_card_image)
+    CONSOLE.log(db_pokedex_card_data)
+
+    return db_pokedex_card_image, db_pokedex_card_data
+
+
 async def dump_console_recording(
     console: Console, title: str, type: Literal["svg", "html"]
 ) -> None:
@@ -102,10 +193,16 @@ async def dump_console_recording(
         title=title.title(),
     )
 
-    console.save_svg(**params)
-    console.save_html(
-        **params.update(path=params["path"].replace(".svg", ".html"))
-    )
+    if type == "svg":
+        console.save_svg(**params)
+    elif type == "html":
+        console.save_html(
+            **params.update(
+                path=params["path"].replace(".svg", ".html")
+            )
+        )
+    else:
+        raise ValueError(f"'{type}' is not a valid argument for type")
 
 
 async def teardown(browser: Browser) -> None:
@@ -128,102 +225,41 @@ async def main_routine(backend: Playwright) -> None:
     browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
     CONSOLE.log("Browser started! 😸")
 
-    # HACK: Skip coroutines for debug
-    if 1 == 0:
-        # Follow entrypoint URL
-        page: Page = await navigate(url=ENTRYPOINT, browser=browser)
+    # Follow entrypoint URL
+    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
 
-        # Show title
-        await dump_console_recording(
-            CONSOLE, title="root_title", type="svg"
-        )
+    # Show title
+    await dump_console_recording(
+        CONSOLE, title="root_title", type="svg"
+    )
 
-        # Get Pokédex URLs
-        urls_pokedex: List[str] = await get_pokedex_urls(page)
-        await dump_console_recording(
-            CONSOLE, title="urls_pokedex", type="svg"
-        )
+    # Get Pokédex URLs
+    urls_pokedex: List[str] = await get_pokedex_urls(page)
+    await dump_console_recording(
+        CONSOLE, title="urls_pokedex", type="svg"
+    )
 
-        # Get generation URLs
-        _: List[str] = await get_generation_urls(page, urls_pokedex)
-        await dump_console_recording(
-            CONSOLE, title="urls_generations", type="svg"
-        )
+    # Get generation URLs
+    _: List[str] = await get_generation_urls(page, urls_pokedex)
+    await dump_console_recording(
+        CONSOLE, title="urls_generations", type="svg"
+    )
 
-        # TODO: Refactor this into coroutine function
-        # TODO: Loop over all Pokédexes and do below card extractions
+    # Data Pokédex cards
+    (
+        data_pokedex_cards_img,
+        data_pokedex_cards_data,
+    ) = await get_pokedex_cards(page, urls_pokedex)
 
-        # Follow Pokédex URL
-        page = await navigate(url=urls_pokedex[0], page=page)
+    # TODO: Refactor to coroutine function
+    # TODO: Loop over all URLs from db_card_image
+    # TODO: Follow URL from card_img_data and scrape all details
 
-        # Pokémon grid
-        locator_card_container: Locator = page.locator(
-            ".infocard-list"
-        ).nth(0)
-        await expect(locator_card_container).to_be_visible()
+    for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
+        ...
 
-        # Get card data
-        locator_card_img_data: Locator = locator_card_container.locator(
-            ".infocard-lg-img"
-        )
-        locator_card_data: Locator = locator_card_container.locator(
-            ".infocard-lg-data"
-        )
-
-        # Extract card image data
-        db_card_image = dict(url=list(), img_src=list(), img_alt=list())
-
-        for card in await locator_card_img_data.all():
-            url: str = urljoin(
-                URL_ROOT,
-                await card.get_by_role("link").get_attribute("href"),
-            )
-            img_src: str | None = await card.get_by_role(
-                "img"
-            ).get_attribute("src")
-            img_alt: str | None = await card.get_by_role(
-                "img"
-            ).get_attribute("alt")
-
-            # Add to db
-            db_card_image["url"].append(url)
-            db_card_image["img_src"].append(img_src)
-            db_card_image["img_alt"].append(img_alt)
-
-            # Debug
-            CONSOLE.log("[bold]URL:", url)
-            CONSOLE.log("[bold]IMG SRC:", img_src)
-            CONSOLE.log("[bold]IMG ALT:", img_alt)
-
-        # Extract card data
-        db_card_data = dict(number=list(), types=list())
-
-        for card in await locator_card_data.all():
-            number: str = await card.locator("small").first.inner_text()
-
-            locator_types: Locator = (
-                card.locator("small").nth(1).get_by_role("link")
-            )
-
-            types: list(str) = list()
-
-            for t in await locator_types.all():
-                types.append(await t.inner_text())
-
-            # Add to db
-            db_card_data["number"].append(number)
-            db_card_data["types"].append(types)
-
-            # Debug
-            CONSOLE.log("[bold]NUMBER:", number)
-            CONSOLE.log("[bold]TYPES:", "; ".join(types))
-
-        # TODO: Refactor to coroutine function
-        # TODO: Loop over all URLs from db_card_image
-        # TODO: Follow URL from card_img_data and scrape all details
-
-        # Example URL
-        _: str = db_card_image["url"][0]
+    # Example URL
+    _: str = db_card_image["url"][0]
 
     # HACK: Eventually use URL from db_card_image["url"] and existing page object
     page = await navigate(
@@ -550,12 +586,6 @@ async def main_routine(backend: Playwright) -> None:
 
     # Debug
     CONSOLE.log(db_other_languages)
-
-    # TODO: Type defenses
-    # TODO: Evolution chart
-    # TODO: <Pokemon> changes
-    # TODO: Name origin
-    # TODO: Moves learned by <Pokémon>: Requires another loop; lot of work
 
     # Teardown
     await teardown(browser)
