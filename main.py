@@ -40,8 +40,10 @@ __all__: List[str] = ["source"]
 CONSOLE = Console(record=True, tab_size=4)
 
 # Switches
+FIREFOX_PARAMS = FirefoxParams(
+    headless=False,
+)
 KEEP_ALIVE = False
-FIREFOX_PARAMS = FirefoxParams(headless=False, timeout=50, slow_mo=100)
 LIMIT_POKEDEX = 1
 LIMIT_CARDS = 5
 
