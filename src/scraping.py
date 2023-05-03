@@ -18,7 +18,7 @@ from src.environ import (
     LIMIT_POKEDEX,
     URL_ROOT,
 )
-from src.util import dump_console_recording, navigate, teardown
+from src.utils import dump_console_recording, navigate, teardown
 
 
 async def get_pokedex_urls(
