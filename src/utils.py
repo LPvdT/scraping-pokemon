@@ -1,12 +1,34 @@
 import asyncio
+import json
 from sys import stdin
 from typing import Any, Awaitable, Coroutine, Literal, Optional, TextIO
 
+import aiofiles
 from playwright.async_api import Browser, Page, async_playwright
 from rich.console import Console
 
 import src.environ as environ
 import src.scraping as scraping
+
+
+async def save_json(
+    obj: Any, filename: str
+) -> Coroutine[Any, Any, Awaitable[None]]:
+    idx = filename.find(".")
+
+    if idx >= 0:
+        filename = filename[0:idx]
+
+    async with aiofiles.open(
+        file=f"./data/static/out/{filename}.json",
+        mode="w",
+        encoding="utf-8",
+    ) as f:
+        await f.write(
+            json.dumps(
+                obj, indent=2, sort_keys=True, ensure_ascii=False
+            )
+        )
 
 
 async def navigate(
