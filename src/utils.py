@@ -5,8 +5,8 @@ from typing import Any, Awaitable, Coroutine, Literal, Optional, TextIO
 from playwright.async_api import Browser, Page, async_playwright
 from rich.console import Console
 
-from src.environ import CONSOLE, KEEP_ALIVE
-from src.scraping import main_coroutine
+import src.environ as environ
+import src.scraping as scraping
 
 
 async def navigate(
@@ -24,8 +24,8 @@ async def navigate(
         await page.goto(url)
 
     # Log
-    CONSOLE.rule("[bold]Page title")
-    CONSOLE.log(await page.title())
+    environ.CONSOLE.rule("[bold]Page title")
+    environ.CONSOLE.log(await page.title())
 
     return page
 
@@ -53,8 +53,8 @@ async def dump_console_recording(
 async def teardown(
     browser: Browser,
 ) -> Coroutine[Any, Any, Awaitable[None]]:
-    if KEEP_ALIVE:
-        CONSOLE.log(">> Press CTRL-D to stop")
+    if environ.KEEP_ALIVE:
+        environ.CONSOLE.log(">> Press CTRL-D to stop")
 
         reader = asyncio.StreamReader()
         pipe: TextIO = stdin
@@ -69,4 +69,4 @@ async def teardown(
 
 async def entrypoint() -> Coroutine[Any, Any, Awaitable[None]]:
     async with async_playwright() as backend:
-        await main_coroutine(backend)
+        await scraping.main_coroutine(backend)

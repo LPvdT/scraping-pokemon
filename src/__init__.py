@@ -1,3 +1,3 @@
-from .environ import create_env
+from src.environ import create_env
 
 create_env()

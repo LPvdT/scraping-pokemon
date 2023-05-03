@@ -2,12 +2,12 @@ from typing import Any, Awaitable, Coroutine, List
 
 from playwright.async_api import Browser, Page, Playwright
 
+import src.utils as utils
 from src.environ import CONSOLE, ENTRYPOINT, FIREFOX_PARAMS
 from src.scraping.coro_generations import get_generation_urls
 from src.scraping.coro_pokedex_cards import get_pokedex_cards
 from src.scraping.coro_pokedex_urls import get_pokedex_urls
 from src.scraping.coro_pokemon_details import get_pokemon_details
-from src.utils import dump_console_recording, navigate, teardown
 
 
 async def main_coroutine(
@@ -18,22 +18,22 @@ async def main_coroutine(
     CONSOLE.log("Browser started! 😸")
 
     # Follow entrypoint URL
-    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
+    page: Page = await utils.navigate(url=ENTRYPOINT, browser=browser)
 
     # Show title
-    await dump_console_recording(
+    await utils.dump_console_recording(
         CONSOLE, title="root_title", type="svg"
     )
 
     # Get Pokédex URLs
     urls_pokedex: List[str] = await get_pokedex_urls(page)
-    await dump_console_recording(
+    await utils.dump_console_recording(
         CONSOLE, title="urls_pokedex", type="svg"
     )
 
     # Get generation URLs
     _: List[str] = await get_generation_urls(page, urls_pokedex)
-    await dump_console_recording(
+    await utils.dump_console_recording(
         CONSOLE, title="urls_generations", type="svg"
     )
 
@@ -48,4 +48,4 @@ async def main_coroutine(
     await get_pokemon_details(page, data_pokedex_cards_img)
 
     # Teardown
-    await teardown(browser)
+    await utils.teardown(browser)

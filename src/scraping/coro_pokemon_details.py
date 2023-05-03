@@ -3,8 +3,8 @@ from unicodedata import normalize
 
 from playwright.async_api import Locator, Page
 
+import src.utils as utils
 from src.environ import CONSOLE
-from src.utils import navigate
 
 
 async def get_pokemon_details(
@@ -16,7 +16,7 @@ async def get_pokemon_details(
         CONSOLE.log(url_pokemon[0])
 
         # Navigate to Pokémon detail page
-        page = await navigate(url=url_pokemon[0], page=page)
+        page = await utils.navigate(url=url_pokemon[0], page=page)
 
         # Fetch description
         locator_description: Locator = (

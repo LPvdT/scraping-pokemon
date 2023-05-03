@@ -3,8 +3,8 @@ from urllib.parse import urljoin
 
 from playwright.async_api import Locator, expect
 
+import src.utils as utils
 from src.environ import CONSOLE, LIMIT_CARDS, LIMIT_POKEDEX, URL_ROOT
-from src.utils import navigate
 
 
 async def get_pokedex_cards(
@@ -24,7 +24,7 @@ async def get_pokedex_cards(
 
     for url in urls_pokedex:
         # Follow Pokédex URL
-        page = await navigate(url=url, page=page)
+        page = await utils.navigate(url=url, page=page)
 
         # Pokémon grid
         locator_card_container: Locator = page.locator(
