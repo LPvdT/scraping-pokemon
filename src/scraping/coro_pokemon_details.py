@@ -9,7 +9,7 @@ from src.environ import CONSOLE
 
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
-) -> Coroutine[Any, Any, Awaitable[None]]:
+) -> Coroutine[Any, Any, Awaitable[dict]]:
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # HACK
         CONSOLE.rule("[bold]url_pokemon")
@@ -22,7 +22,8 @@ async def get_pokemon_details(
         locator_description: Locator = (
             page.locator("main").locator("p").first
         )
-        description: str = await locator_description.inner_text()
+        _description: str = await locator_description.inner_text()
+        description = normalize("NFKC", _description)
 
         # HACK
         CONSOLE.rule("[bold]Description")
@@ -348,3 +349,14 @@ async def get_pokemon_details(
         # HACK
         CONSOLE.rule("[bold]db_other_languages")
         CONSOLE.log(db_other_languages)
+
+        return {
+            "description": description,
+            "pokedex_data": db_pokedex_data,
+            "training": db_training,
+            "breeding": db_breeding,
+            "base_stats": db_base_stats,
+            "pokedex_entries": db_pokedex_entries,
+            "where_to_find": db_where_to_find,
+            "other_languages": db_other_languages,
+        }
