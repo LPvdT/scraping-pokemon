@@ -1,207 +1,29 @@
-from typing import Any, Awaitable, Coroutine, List, Tuple
+from typing import Any, Awaitable, Coroutine, List
 from unicodedata import normalize
-from urllib.parse import urljoin
 
-from playwright.async_api import (
-    Browser,
-    Locator,
-    Page,
-    Playwright,
-    expect,
-)
+from playwright.async_api import Locator, Page
 
-from src.environ import (
-    CONSOLE,
-    ENTRYPOINT,
-    FIREFOX_PARAMS,
-    LIMIT_CARDS,
-    LIMIT_POKEDEX,
-    URL_ROOT,
-)
-from src.utils import dump_console_recording, navigate, teardown
-
-
-async def get_pokedex_urls(
-    page: Page,
-) -> Coroutine[Any, Any, Awaitable[List[str]]]:
-    # Storage
-    db_urls_pokedex: List[str] = list()
-
-    # Locate Pokédexes list
-    locator_main: Locator = page.get_by_role("main")
-    await expect(locator_main).to_be_visible()
-
-    locator_pokedexes: Locator = (
-        locator_main.get_by_role("navigation")
-        .get_by_role("list")
-        .nth(1)
-        .get_by_role("listitem")
-    )
-
-    # Extract and compile URLs
-    for li in await locator_pokedexes.all():
-        pokedex: str = urljoin(
-            URL_ROOT, await li.get_by_role("link").get_attribute("href")
-        )
-        db_urls_pokedex.append(pokedex)
-
-    return db_urls_pokedex
-
-
-async def get_generation_urls(
-    page: Page, urls_pokedex: List[str]
-) -> Coroutine[Any, Any, Awaitable[List[str]]]:
-    # Storage
-    db_urls_generations: List[str] = list()
-
-    # Locate generations
-    locator_main: Locator = page.get_by_role("main")
-    await expect(locator_main).to_be_visible()
-
-    locator_links: Locator = locator_main.get_by_role(
-        "list"
-    ).get_by_role("link")
-
-    # Extract and compile URLs
-    for a in await locator_links.all():
-        href: str | None = await a.get_attribute("href")
-        db_urls_generations.append(urljoin(urls_pokedex[0], href))
-
-    return db_urls_generations
-
-
-async def get_pokedex_cards(
-    page, urls_pokedex
-) -> Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]:
-    # Storage
-    db_pokedex_card_image: List[dict] = list()
-    db_pokedex_card_data: List[dict] = list()
-
-    # HACK: Limit for debugging
-    if LIMIT_POKEDEX > 0:
-        urls_pokedex = urls_pokedex[:LIMIT_POKEDEX]
-
-        CONSOLE.rule(
-            f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_POKEDEX}"
-        )
-
-    for url in urls_pokedex:
-        # Follow Pokédex URL
-        page = await navigate(url=url, page=page)
-
-        # Pokémon grid
-        locator_card_container: Locator = page.locator(
-            ".infocard-list"
-        ).nth(0)
-        await expect(locator_card_container).to_be_visible()
-
-        # Get card data
-        locator_card_img_data: Locator = locator_card_container.locator(
-            ".infocard-lg-img"
-        )
-        locator_card_data: Locator = locator_card_container.locator(
-            ".infocard-lg-data"
-        )
-
-        card_img_data_all = await locator_card_img_data.all()
-        card_data_all = await locator_card_data.all()
-
-        # HACK: Limit for debugging
-        if LIMIT_CARDS > 0:
-            card_img_data_all = card_img_data_all[:LIMIT_CARDS]
-            card_data_all = card_data_all[:LIMIT_CARDS]
-
-            CONSOLE.rule(
-                f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_CARDS}"
-            )
-
-        for card_image, card_data in zip(
-            card_img_data_all, card_data_all
-        ):
-            # Storage
-            db_card_image = dict(
-                url=list(), img_src=list(), img_alt=list()
-            )
-            db_card_data = dict(number=list(), types=list())
-
-            # Extract card image data
-            url: str = urljoin(
-                URL_ROOT,
-                await card_image.get_by_role("link").get_attribute(
-                    "href"
-                ),
-            )
-            img_src: str | None = await card_image.get_by_role(
-                "img"
-            ).get_attribute("src")
-            img_alt: str | None = await card_image.get_by_role(
-                "img"
-            ).get_attribute("alt")
-
-            # Add to db
-            db_card_image["url"].append(url)
-            db_card_image["img_src"].append(img_src)
-            db_card_image["img_alt"].append(img_alt)
-
-            # HACK
-            CONSOLE.rule("[bold]card_image")
-            CONSOLE.log("[bold]URL:", url)
-            CONSOLE.log("[bold]IMG SRC:", img_src)
-            CONSOLE.log("[bold]IMG ALT:", img_alt)
-
-            # Extract card data
-            number: str = await card_data.locator(
-                "small"
-            ).first.inner_text()
-
-            locator_types: Locator = (
-                card_data.locator("small").nth(1).get_by_role("link")
-            )
-
-            types: list(str) = list()
-
-            for t in await locator_types.all():
-                types.append(await t.inner_text())
-
-            # Add to db
-            db_card_data["number"].append(number)
-            db_card_data["types"].append(types)
-
-            # HACK
-            CONSOLE.rule("[bold]card_data")
-            CONSOLE.log("[bold]NUMBER:", number)
-            CONSOLE.log("[bold]TYPES:", "; ".join(types))
-
-            # Append to db
-            db_pokedex_card_image.append(db_card_image)
-            db_pokedex_card_data.append(db_card_data)
-
-    # HACK
-    CONSOLE.rule("[bold]db_pokedex_card_image")
-    CONSOLE.log(db_pokedex_card_image)
-
-    CONSOLE.rule("[bold]db_pokedex_card_data")
-    CONSOLE.log(db_pokedex_card_data)
-
-    return db_pokedex_card_image, db_pokedex_card_data
+import src.utils as utils
+from src.environ import CONSOLE
 
 
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
-) -> Coroutine[Any, Any, Awaitable[None]]:
+) -> Coroutine[Any, Any, Awaitable[dict]]:
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # HACK
         CONSOLE.rule("[bold]url_pokemon")
         CONSOLE.log(url_pokemon[0])
 
         # Navigate to Pokémon detail page
-        page = await navigate(url=url_pokemon[0], page=page)
+        page = await utils.navigate(url=url_pokemon[0], page=page)
 
         # Fetch description
         locator_description: Locator = (
             page.locator("main").locator("p").first
         )
-        description: str = await locator_description.inner_text()
+        _description: str = await locator_description.inner_text()
+        description = normalize("NFKC", _description)
 
         # HACK
         CONSOLE.rule("[bold]Description")
@@ -528,43 +350,13 @@ async def get_pokemon_details(
         CONSOLE.rule("[bold]db_other_languages")
         CONSOLE.log(db_other_languages)
 
-
-async def main_coroutine(
-    backend: Playwright,
-) -> Coroutine[Any, Any, Awaitable[None]]:
-    # Launch browser and navigate
-    browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
-    CONSOLE.log("Browser started! 😸")
-
-    # Follow entrypoint URL
-    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
-
-    # Show title
-    await dump_console_recording(
-        CONSOLE, title="root_title", type="svg"
-    )
-
-    # Get Pokédex URLs
-    urls_pokedex: List[str] = await get_pokedex_urls(page)
-    await dump_console_recording(
-        CONSOLE, title="urls_pokedex", type="svg"
-    )
-
-    # Get generation URLs
-    _: List[str] = await get_generation_urls(page, urls_pokedex)
-    await dump_console_recording(
-        CONSOLE, title="urls_generations", type="svg"
-    )
-
-    # Data Pokédex cards
-    (
-        data_pokedex_cards_img,
-        data_pokedex_cards_data,
-    ) = await get_pokedex_cards(page, urls_pokedex)
-
-    # Get Pokémon details
-    # TODO: Return shit from the coroutine
-    await get_pokemon_details(page, data_pokedex_cards_img)
-
-    # Teardown
-    await teardown(browser)
+        return {
+            "description": description,
+            "pokedex_data": db_pokedex_data,
+            "training": db_training,
+            "breeding": db_breeding,
+            "base_stats": db_base_stats,
+            "pokedex_entries": db_pokedex_entries,
+            "where_to_find": db_where_to_find,
+            "other_languages": db_other_languages,
+        }
