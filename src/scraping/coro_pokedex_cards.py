@@ -18,8 +18,8 @@ async def get_pokedex_cards(
     if LIMIT_POKEDEX > 0:
         urls_pokedex = urls_pokedex[:LIMIT_POKEDEX]
 
-        CONSOLE.rule(
-            f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_POKEDEX}"
+        CONSOLE.log(
+            f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_POKEDEX} records"
         )
 
     for url in urls_pokedex:
@@ -48,8 +48,8 @@ async def get_pokedex_cards(
             card_img_data_all = card_img_data_all[:LIMIT_CARDS]
             card_data_all = card_data_all[:LIMIT_CARDS]
 
-            CONSOLE.rule(
-                f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_CARDS}"
+            CONSOLE.log(
+                f"[bold red]LIMIT[/bold red]: 'urls_pokedex' - {LIMIT_CARDS} records"
             )
 
         for card_image, card_data in zip(
