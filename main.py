@@ -9,6 +9,9 @@ from typing import (
     Tuple,
     TypedDict,
     Union,
+    Awaitable,
+    Coroutine,
+    Any,
 )
 from unicodedata import normalize
 from urllib.parse import urljoin
@@ -57,7 +60,7 @@ async def navigate(
     url: str,
     browser: Optional[Browser] = None,
     page: Optional[Page] = None,
-) -> Page:
+) -> Coroutine[Any, Any, Awaitable[Page]]:
     if not page and not browser:
         raise TypeError("Either 'browser' or 'page' must be provided")
 
@@ -74,7 +77,9 @@ async def navigate(
     return page
 
 
-async def get_pokedex_urls(page: Page) -> List[str]:
+async def get_pokedex_urls(
+    page: Page,
+) -> Coroutine[Any, Any, Awaitable[List[str]]]:
     # Storage
     db_urls_pokedex: List[str] = list()
 
@@ -101,7 +106,7 @@ async def get_pokedex_urls(page: Page) -> List[str]:
 
 async def get_generation_urls(
     page: Page, urls_pokedex: List[str]
-) -> List[str]:
+) -> Coroutine[Any, Any, Awaitable[List[str]]]:
     # Storage
     db_urls_generations: List[str] = list()
 
@@ -123,7 +128,7 @@ async def get_generation_urls(
 
 async def get_pokedex_cards(
     page, urls_pokedex
-) -> Tuple[List[dict], List[dict]]:
+) -> Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]:
     # Storage
     db_pokedex_card_image: List[dict] = list()
     db_pokedex_card_data: List[dict] = list()
@@ -237,73 +242,9 @@ async def get_pokedex_cards(
     return db_pokedex_card_image, db_pokedex_card_data
 
 
-async def dump_console_recording(
-    console: Console, title: str, type: Literal["svg", "html"]
-) -> None:
-    params = dict(
-        path=f"./data/static/logs/{title}.svg",
-        title=title.title(),
-    )
-
-    if type == "svg":
-        console.save_svg(**params)
-    elif type == "html":
-        console.save_html(
-            **params.update(
-                path=params["path"].replace(".svg", ".html")
-            )
-        )
-    else:
-        raise ValueError(f"'{type}' is not a valid argument for type")
-
-
-async def teardown(browser: Browser) -> None:
-    if KEEP_ALIVE:
-        CONSOLE.log(">> Press CTRL-D to stop")
-
-        reader = asyncio.StreamReader()
-        pipe: TextIO = stdin
-        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-
-        await loop.connect_read_pipe(
-            lambda: asyncio.StreamReaderProtocol(reader), pipe
-        )
-    else:
-        await browser.close()
-
-
-async def main_coroutine(backend: Playwright) -> None:
-    # Launch browser and navigate
-    browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
-    CONSOLE.log("Browser started! 😸")
-
-    # Follow entrypoint URL
-    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
-
-    # Show title
-    await dump_console_recording(
-        CONSOLE, title="root_title", type="svg"
-    )
-
-    # Get Pokédex URLs
-    urls_pokedex: List[str] = await get_pokedex_urls(page)
-    await dump_console_recording(
-        CONSOLE, title="urls_pokedex", type="svg"
-    )
-
-    # Get generation URLs
-    _: List[str] = await get_generation_urls(page, urls_pokedex)
-    await dump_console_recording(
-        CONSOLE, title="urls_generations", type="svg"
-    )
-
-    # Data Pokédex cards
-    (
-        data_pokedex_cards_img,
-        data_pokedex_cards_data,
-    ) = await get_pokedex_cards(page, urls_pokedex)
-
-    # TODO: Refactor to coroutine function
+async def get_pokemon_details(
+    page: Page, data_pokedex_cards_img: List[dict]
+) -> Coroutine[Any, Any, Awaitable[None]]:
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # HACK
         CONSOLE.rule("[bold]url_pokemon")
@@ -643,11 +584,86 @@ async def main_coroutine(backend: Playwright) -> None:
         CONSOLE.rule("[bold]db_other_languages")
         CONSOLE.log(db_other_languages)
 
+
+async def dump_console_recording(
+    console: Console, title: str, type: Literal["svg", "html"]
+) -> Coroutine[Any, Any, Awaitable[None]]:
+    params = dict(
+        path=f"./data/static/logs/{title}.svg",
+        title=title.title(),
+    )
+
+    if type == "svg":
+        console.save_svg(**params)
+    elif type == "html":
+        console.save_html(
+            **params.update(
+                path=params["path"].replace(".svg", ".html")
+            )
+        )
+    else:
+        raise ValueError(f"'{type}' is not a valid argument for type")
+
+
+async def teardown(
+    browser: Browser,
+) -> Coroutine[Any, Any, Awaitable[None]]:
+    if KEEP_ALIVE:
+        CONSOLE.log(">> Press CTRL-D to stop")
+
+        reader = asyncio.StreamReader()
+        pipe: TextIO = stdin
+        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+
+        await loop.connect_read_pipe(
+            lambda: asyncio.StreamReaderProtocol(reader), pipe
+        )
+    else:
+        await browser.close()
+
+
+async def main_coroutine(
+    backend: Playwright,
+) -> Coroutine[Any, Any, Awaitable[None]]:
+    # Launch browser and navigate
+    browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)
+    CONSOLE.log("Browser started! 😸")
+
+    # Follow entrypoint URL
+    page: Page = await navigate(url=ENTRYPOINT, browser=browser)
+
+    # Show title
+    await dump_console_recording(
+        CONSOLE, title="root_title", type="svg"
+    )
+
+    # Get Pokédex URLs
+    urls_pokedex: List[str] = await get_pokedex_urls(page)
+    await dump_console_recording(
+        CONSOLE, title="urls_pokedex", type="svg"
+    )
+
+    # Get generation URLs
+    _: List[str] = await get_generation_urls(page, urls_pokedex)
+    await dump_console_recording(
+        CONSOLE, title="urls_generations", type="svg"
+    )
+
+    # Data Pokédex cards
+    (
+        data_pokedex_cards_img,
+        data_pokedex_cards_data,
+    ) = await get_pokedex_cards(page, urls_pokedex)
+
+    # Get Pokémon details
+    # TODO: Return shit from the coroutine
+    await get_pokemon_details(page, data_pokedex_cards_img)
+
     # Teardown
     await teardown(browser)
 
 
-async def entrypoint() -> None:
+async def entrypoint() -> Coroutine[Any, Any, Awaitable[None]]:
     async with async_playwright() as backend:
         await main_coroutine(backend)
 
