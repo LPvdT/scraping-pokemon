@@ -4,17 +4,12 @@ from unicodedata import normalize
 from playwright.async_api import Locator, Page
 
 import src.utils as utils
-from src.environ import CONSOLE
 
 
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
-        # HACK
-        CONSOLE.rule("[bold]url_pokemon")
-        CONSOLE.log(url_pokemon[0])
-
         # Navigate to Pokémon detail page
         page = await utils.navigate(url=url_pokemon[0], page=page)
 
@@ -24,10 +19,6 @@ async def get_pokemon_details(
         )
         _description: str = await locator_description.inner_text()
         description = normalize("NFKC", _description)
-
-        # HACK
-        CONSOLE.rule("[bold]Description")
-        CONSOLE.log(description)
 
         ################
         # Pokédex data #
@@ -85,10 +76,6 @@ async def get_pokemon_details(
         db_pokedex_data["abilities"].append(_abilities_data)
         db_pokedex_data["local_no"].append(_local_no_data)
 
-        # HACK
-        CONSOLE.rule("[bold]db_pokedex_data")
-        CONSOLE.log(db_pokedex_data)
-
         ############
         # Training #
         ############
@@ -131,10 +118,6 @@ async def get_pokemon_details(
         db_training["base_exp"].append(_base_exp_data)
         db_training["growth_rate"].append(_growth_rate_data)
 
-        # HACK
-        CONSOLE.rule("[bold]db_training")
-        CONSOLE.log(db_training)
-
         ############
         # Breeding #
         ############
@@ -166,10 +149,6 @@ async def get_pokemon_details(
         db_breeding["egg_groups"].append(_egg_groups_data)
         db_breeding["gender"].append(_gender_data)
         db_breeding["egg_cycles"].append(_egg_cycles_data)
-
-        # HACK
-        CONSOLE.rule("[bold]db_breeding")
-        CONSOLE.log(db_breeding)
 
         ##############
         # Base stats #
@@ -253,10 +232,6 @@ async def get_pokemon_details(
             )
         }
 
-        # HACK
-        CONSOLE.rule("[bold]db_base_stats")
-        CONSOLE.log(db_base_stats)
-
         ###################
         # Pokédex entries #
         ###################
@@ -283,10 +258,6 @@ async def get_pokemon_details(
             # Store
             db_pokedex_entries["game"].append(_game_data)
             db_pokedex_entries["entry"].append(_entry_data)
-
-        # HACK
-        CONSOLE.rule("[bold]db_pokedex_entries")
-        CONSOLE.log(db_pokedex_entries)
 
         #################
         # Where to find #
@@ -315,10 +286,6 @@ async def get_pokemon_details(
             db_where_to_find["game"].append(_game_data)
             db_where_to_find["location"].append(_location_data)
 
-        # HACK
-        CONSOLE.rule("[bold]db_where_to_find")
-        CONSOLE.log(db_where_to_find)
-
         ###################
         # Other languages #
         ###################
@@ -345,10 +312,6 @@ async def get_pokemon_details(
             # Store
             db_other_languages["language"].append(_language_data)
             db_other_languages["name"].append(_name_data)
-
-        # HACK
-        CONSOLE.rule("[bold]db_other_languages")
-        CONSOLE.log(db_other_languages)
 
         return {
             "description": description,

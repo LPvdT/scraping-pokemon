@@ -58,15 +58,15 @@ async def dump_console_recording(
     params = dict(
         path=f"./data/static/logs/{title}.svg",
         title=title.title(),
+        clear=False,
     )
 
     if type == "svg":
         console.save_svg(**params)
     elif type == "html":
         console.save_html(
-            **params.update(
-                path=params["path"].replace(".svg", ".html")
-            )
+            path=params["path"].replace(".svg", ".html"),
+            clear=params["clear"],
         )
     else:
         raise ValueError(f"'{type}' is not a valid argument for type")

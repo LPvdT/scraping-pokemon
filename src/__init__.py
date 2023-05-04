@@ -1,3 +1,9 @@
-from src.environ import create_env
+from rich.traceback import install
 
+from src.environ import CONSOLE, create_env
+
+# Create/assert folder structure
 create_env()
+
+# Rich console traceback hook
+install(console=CONSOLE, indent_guides=True)

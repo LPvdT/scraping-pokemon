@@ -5,7 +5,6 @@ from rich.console import Console
 
 from src.types import FirefoxParams
 
-
 # Setup
 CONSOLE = Console(record=True, tab_size=4)
 
@@ -23,7 +22,11 @@ URL_POKEDEX_INDEX = "pokedex"
 ENTRYPOINT: str = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
 
 # Structure
-FOLDERS: list[str] = ["data/static/img", "data/static/logs"]
+FOLDERS: list[str] = [
+    "data/static/img",
+    "data/static/logs",
+    "data/static/out",
+]
 
 
 def create_env() -> None:

@@ -24,13 +24,19 @@ async def main_coroutine(
     urls_pokedex: List[str] = await get_pokedex_urls(page)
 
     # Get generation URLs
-    _: List[str] = await get_generation_urls(page, urls_pokedex)
+    data_generation_urls = await get_generation_urls(page, urls_pokedex)
+
+    await utils.save_json(data_generation_urls, "data_generation_urls")
 
     # Data Pokédex cards
     (
         data_pokedex_cards_img,
         data_pokedex_cards_data,
     ) = await get_pokedex_cards(page, urls_pokedex)
+
+    await utils.save_json(
+        data_pokedex_cards_img, "data_pokedex_cards_img"
+    )
 
     await utils.save_json(
         data_pokedex_cards_data, "data_pokedex_cards_data"
@@ -43,9 +49,10 @@ async def main_coroutine(
 
     await utils.save_json(data_pokemon_details, "data_pokemon_details")
 
-    await utils.dump_console_recording(
-        console=CONSOLE, title="recording", type="svg"
-    )
+    for _type in ["svg", "html"]:
+        await utils.dump_console_recording(
+            console=CONSOLE, title="recording", type=_type
+        )
 
     # Teardown
     await utils.teardown(browser)
