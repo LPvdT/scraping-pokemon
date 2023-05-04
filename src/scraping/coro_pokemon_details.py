@@ -4,6 +4,7 @@ from unicodedata import normalize
 from playwright.async_api import Locator, Page
 
 import src.utils as utils
+from src.environ import SCREENSHOT_PAGE
 
 
 async def get_pokemon_details(
@@ -31,9 +32,13 @@ async def get_pokemon_details(
         name = normalize("NFKC", _name)
 
         # Screenshot page
-        await utils.save_screenshot(
-            element=page, filename=name, img_type="png", full_page=True
-        )
+        if SCREENSHOT_PAGE:
+            await utils.save_screenshot(
+                element=page,
+                filename=name,
+                img_type="png",
+                full_page=True,
+            )
 
         # Fetch description
         locator_description: Locator = (
