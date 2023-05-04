@@ -10,6 +10,7 @@ async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
     # Storage
+    names = list()
     descriptions = list()
     pokedex_data = list()
     training = list()
@@ -22,6 +23,17 @@ async def get_pokemon_details(
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # Navigate to Pokémon detail page
         page = await utils.navigate(url=url_pokemon[0], page=page)
+
+        # Fetch name
+        locator_name = page.locator("main").get_by_role("heading").first
+        _name = await locator_name.inner_text()
+
+        name = normalize("NFKC", _name)
+
+        # Screenshot page
+        await utils.save_screenshot(
+            element=page, filename=name, img_type="png", full_page=True
+        )
 
         # Fetch description
         locator_description: Locator = (
@@ -325,6 +337,7 @@ async def get_pokemon_details(
             db_other_languages["name"].append(_name_data)
 
         # Add iteration to storage
+        names.append(name)
         descriptions.append(description)
         pokedex_data.append(db_pokedex_data)
         training.append(db_training)
@@ -335,6 +348,7 @@ async def get_pokemon_details(
         other_languages.append(db_other_languages)
 
     return {
+        "name": name,
         "description": descriptions,
         "pokedex_data": pokedex_data,
         "training": training,
