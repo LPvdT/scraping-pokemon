@@ -9,6 +9,16 @@ import src.utils as utils
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
+    # Storage
+    descriptions = list()
+    pokedex_data = list()
+    training = list()
+    breeding = list()
+    base_stats = list()
+    pokedex_entries = list()
+    where_to_find = list()
+    other_languages = list()
+
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
         # Navigate to Pokémon detail page
         page = await utils.navigate(url=url_pokemon[0], page=page)
@@ -18,6 +28,7 @@ async def get_pokemon_details(
             page.locator("main").locator("p").first
         )
         _description: str = await locator_description.inner_text()
+
         description = normalize("NFKC", _description)
 
         ################
@@ -313,13 +324,23 @@ async def get_pokemon_details(
             db_other_languages["language"].append(_language_data)
             db_other_languages["name"].append(_name_data)
 
-        return {
-            "description": description,
-            "pokedex_data": db_pokedex_data,
-            "training": db_training,
-            "breeding": db_breeding,
-            "base_stats": db_base_stats,
-            "pokedex_entries": db_pokedex_entries,
-            "where_to_find": db_where_to_find,
-            "other_languages": db_other_languages,
-        }
+        # Add iteration to storage
+        descriptions.append(description)
+        pokedex_data.append(db_pokedex_data)
+        training.append(db_training)
+        breeding.append(db_breeding)
+        base_stats.append(db_base_stats)
+        pokedex_entries.append(db_pokedex_entries)
+        where_to_find.append(db_where_to_find)
+        other_languages.append(db_other_languages)
+
+    return {
+        "description": descriptions,
+        "pokedex_data": pokedex_data,
+        "training": training,
+        "breeding": breeding,
+        "base_stats": base_stats,
+        "pokedex_entries": pokedex_entries,
+        "where_to_find": where_to_find,
+        "other_languages": other_languages,
+    }
