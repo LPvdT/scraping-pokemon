@@ -14,7 +14,7 @@ async def get_pokedex_cards(
     db_pokedex_card_image: List[dict] = list()
     db_pokedex_card_data: List[dict] = list()
 
-    # HACK: Limit for debugging
+    # Pokédex limit
     if LIMIT_POKEDEX > 0:
         urls_pokedex = urls_pokedex[:LIMIT_POKEDEX]
 
@@ -43,7 +43,7 @@ async def get_pokedex_cards(
         card_img_data_all = await locator_card_img_data.all()
         card_data_all = await locator_card_data.all()
 
-        # HACK: Limit for debugging
+        # Card limit
         if LIMIT_CARDS > 0:
             card_img_data_all = card_img_data_all[:LIMIT_CARDS]
             card_data_all = card_data_all[:LIMIT_CARDS]
@@ -80,12 +80,6 @@ async def get_pokedex_cards(
             db_card_image["img_src"].append(img_src)
             db_card_image["img_alt"].append(img_alt)
 
-            # HACK
-            CONSOLE.rule("[bold]card_image")
-            CONSOLE.log("[bold]URL:", url)
-            CONSOLE.log("[bold]IMG SRC:", img_src)
-            CONSOLE.log("[bold]IMG ALT:", img_alt)
-
             # Extract card data
             number: str = await card_data.locator(
                 "small"
@@ -104,20 +98,8 @@ async def get_pokedex_cards(
             db_card_data["number"].append(number)
             db_card_data["types"].append(types)
 
-            # HACK
-            CONSOLE.rule("[bold]card_data")
-            CONSOLE.log("[bold]NUMBER:", number)
-            CONSOLE.log("[bold]TYPES:", "; ".join(types))
-
             # Append to db
             db_pokedex_card_image.append(db_card_image)
             db_pokedex_card_data.append(db_card_data)
-
-    # HACK
-    CONSOLE.rule("[bold]db_pokedex_card_image")
-    CONSOLE.log(db_pokedex_card_image)
-
-    CONSOLE.rule("[bold]db_pokedex_card_data")
-    CONSOLE.log(db_pokedex_card_data)
 
     return db_pokedex_card_image, db_pokedex_card_data
