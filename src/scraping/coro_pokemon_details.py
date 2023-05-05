@@ -11,6 +11,7 @@ async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
     # Storage
+    keys = list()
     names = list()
     descriptions = list()
     pokedex_data = list()
@@ -342,6 +343,11 @@ async def get_pokemon_details(
             db_other_languages["name"].append(_name_data)
 
         # Add iteration to storage
+        keys.append(
+            await utils.generate_hash(
+                (db_pokedex_data["national_no"], name)
+            )
+        )
         names.append(name)
         descriptions.append(description)
         pokedex_data.append(db_pokedex_data)
@@ -353,7 +359,8 @@ async def get_pokemon_details(
         other_languages.append(db_other_languages)
 
     return {
-        "name": name,
+        "key": keys,
+        "name": names,
         "description": descriptions,
         "pokedex_data": pokedex_data,
         "training": training,
