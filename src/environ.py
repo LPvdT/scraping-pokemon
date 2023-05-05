@@ -7,19 +7,20 @@ from src.types import FirefoxParams
 
 # Setup
 CONSOLE = Console(record=True, tab_size=4)
-
-# Switches
 FIREFOX_PARAMS = FirefoxParams(
     headless=False,
 )
-KEEP_ALIVE = False
-LIMIT_POKEDEX = 1
-LIMIT_CARDS = 5
+
+# Switches
+KEEP_ALIVE: bool = False
+LIMIT_POKEDEX: int = 1
+LIMIT_CARDS: int = 5
+SCREENSHOT_PAGE: bool = False
 
 # URL
 URL_ROOT = "https://pokemondb.net"
 URL_POKEDEX_INDEX = "pokedex"
-ENTRYPOINT: str = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
+ENTRYPOINT = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
 
 # Structure
 FOLDERS: list[str] = [

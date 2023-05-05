@@ -1,14 +1,45 @@
 import asyncio
 import json
 from sys import stdin
-from typing import Any, Awaitable, Coroutine, Literal, Optional, TextIO
+from typing import (
+    Any,
+    Awaitable,
+    Coroutine,
+    Literal,
+    Optional,
+    TextIO,
+    Union,
+)
 
 import aiofiles
-from playwright.async_api import Browser, Page, async_playwright
+from playwright.async_api import (
+    Browser,
+    Locator,
+    Page,
+    async_playwright,
+)
 from rich.console import Console
 
 import src.environ as environ
 import src.scraping as scraping
+
+
+async def save_screenshot(
+    element: Union[Locator, Page],
+    filename: str,
+    img_type: Literal["jpg", "png"],
+    full_page: bool = False,
+) -> Coroutine[Any, Any, Awaitable[None]]:
+    idx = filename.find(".")
+
+    if idx >= 0:
+        filename = filename[:idx]
+
+    await element.screenshot(
+        type=img_type,
+        path=f"./data/static/img/{filename}.{img_type}",
+        full_page=full_page,
+    )
 
 
 async def save_json(
