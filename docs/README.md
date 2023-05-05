@@ -31,4 +31,4 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 ## Concurrent Pokémon details
 
 - [ ] Fix timeout issue
-  - Currently, the asyncio.gather call for the Pokémon detail concurrent batch scraping causes a timeout.
+  - Currently, the `asyncio.gather` call for the Pokémon detail concurrent batch scraping causes a timeout.
