@@ -65,7 +65,7 @@ async def save_screenshot(
 
 
 async def save_json(
-    obj: Any, filename: str
+    obj: Any, filename: str, sort: bool = False
 ) -> Coroutine[Any, Any, Awaitable[None]]:
     idx = filename.find(".")
 
@@ -79,9 +79,20 @@ async def save_json(
     ) as f:
         await f.write(
             json.dumps(
-                obj, indent=2, sort_keys=True, ensure_ascii=False
+                obj, indent=2, sort_keys=sort, ensure_ascii=False
             )
         )
+
+
+def clean_text(text: str) -> str:
+    _text = text
+
+    for sub in ["\u2019", "\u2018", "\u2019"]:
+        _text = _text.replace(sub, "\u0060")
+
+    _text = _text.replace("\u2013", "\u002d")
+
+    return _text
 
 
 async def navigate(
