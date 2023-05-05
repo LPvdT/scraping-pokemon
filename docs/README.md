@@ -27,3 +27,8 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 - [ ] Data below the table *Base stats* does not get scraped.
   - Suggestion: Find tables in relation to position of the header (e.g. *Base stats*), in order to properly determine its location.
+
+## Concurrent Pokémon details
+
+- [ ] Fix timeout issue
+  - Currently, the asyncio.gather call for the Pokémon detail concurrent batch scraping causes a timeout.
