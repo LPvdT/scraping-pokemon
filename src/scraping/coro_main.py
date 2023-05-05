@@ -44,7 +44,7 @@ async def main_coroutine(
 
     # Get Pokémon details
     data_pokemon_details = await get_pokemon_details(
-        page, data_pokedex_cards_img
+        browser, data_pokedex_cards_img
     )
 
     await utils.save_json(data_pokemon_details, "data_pokemon_details")

@@ -1,10 +1,12 @@
 import asyncio
+from itertools import islice
 import json
 from sys import stdin
 from typing import (
     Any,
     Awaitable,
     Coroutine,
+    Iterable,
     Literal,
     Optional,
     TextIO,
@@ -22,6 +24,15 @@ from rich.console import Console
 
 import src.environ as environ
 import src.scraping as scraping
+
+
+async def batch_iterable(
+    it: Iterable, size: int
+) -> Coroutine[Any, Any, Awaitable[list]]:
+    it = iter(it)
+    batched_it = iter(lambda: tuple(islice(it, size)), ())
+
+    return list(batched_it)
 
 
 async def save_screenshot(
