@@ -27,6 +27,7 @@ FOLDERS: list[str] = [
     "data/static/img",
     "data/static/logs",
     "data/static/out",
+    "data/db",
 ]
 
 
