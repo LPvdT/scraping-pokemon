@@ -10,13 +10,13 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 - [ ] Type defenses
 - [ ] Evolution chart
-- [ ] *Bulbasaur*changes
+- [ ] *Bulbasaur* changes
 - [ ] Name origin
 - [ ] Moves learned by *Bulbasaur*: Requires another loop; lot of work
 
 ## Data dumps
 
-- [ ] Find a way to properly tie the data together.
+- [x] Find a way to properly tie the data together.
   - Such that everything is properly grouped by e.g. Pokémon.
 
 # Bugs
