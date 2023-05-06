@@ -10,13 +10,13 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 - [ ] Type defenses
 - [ ] Evolution chart
-- [ ] *Bulbasaur*changes
+- [ ] *Bulbasaur* changes
 - [ ] Name origin
 - [ ] Moves learned by *Bulbasaur*: Requires another loop; lot of work
 
 ## Data dumps
 
-- [ ] Find a way to properly tie the data together.
+- [x] Find a way to properly tie the data together.
   - Such that everything is properly grouped by e.g. Pokémon.
 
 # Bugs
@@ -31,4 +31,4 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 ## Concurrent Pokémon details
 
 - [ ] Fix timeout issue
-  - Currently, the asyncio.gather call for the Pokémon detail concurrent batch scraping causes a timeout.
+  - Currently, the `asyncio.gather` call for the Pokémon detail concurrent batch scraping causes a timeout.

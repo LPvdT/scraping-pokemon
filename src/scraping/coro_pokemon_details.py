@@ -10,18 +10,23 @@ from src.environ import SCREENSHOT_PAGE
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
-    # Storage
-    names = list()
-    descriptions = list()
-    pokedex_data = list()
-    training = list()
-    breeding = list()
-    base_stats = list()
-    pokedex_entries = list()
-    where_to_find = list()
-    other_languages = list()
+    db_pokemon: List[dict] = list()
 
     for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
+        # Container
+        pokemon = dict(
+            key=...,
+            name=...,
+            description=...,
+            pokedex_data=...,
+            training=...,
+            breeding=...,
+            base_stats=...,
+            pokedex_entries=...,
+            where_to_find=...,
+            other_languages=...,
+        )
+
         # Navigate to Pokémon detail page
         page = await utils.navigate(url=url_pokemon[0], page=page)
 
@@ -341,25 +346,26 @@ async def get_pokemon_details(
             db_other_languages["language"].append(_language_data)
             db_other_languages["name"].append(_name_data)
 
-        # Add iteration to storage
-        names.append(name)
-        descriptions.append(description)
-        pokedex_data.append(db_pokedex_data)
-        training.append(db_training)
-        breeding.append(db_breeding)
-        base_stats.append(db_base_stats)
-        pokedex_entries.append(db_pokedex_entries)
-        where_to_find.append(db_where_to_find)
-        other_languages.append(db_other_languages)
+        # Generate key hash
+        _key = await utils.generate_hash(
+            (db_pokedex_data["national_no"], name)
+        )
 
-    return {
-        "name": name,
-        "description": descriptions,
-        "pokedex_data": pokedex_data,
-        "training": training,
-        "breeding": breeding,
-        "base_stats": base_stats,
-        "pokedex_entries": pokedex_entries,
-        "where_to_find": where_to_find,
-        "other_languages": other_languages,
-    }
+        # Compile iteration data
+        pokemon["key"] = _key
+        pokemon["name"] = name
+        pokemon["description"] = description
+        pokemon["pokedex_data"] = db_pokedex_data
+
+        pokemon["training"] = db_training
+        pokemon["breeding"] = db_breeding
+        pokemon["base_stats"] = db_base_stats
+
+        pokemon["pokedex_entries"] = db_pokedex_entries
+        pokemon["where_to_find"] = db_where_to_find
+        pokemon["other_languages"] = db_other_languages
+
+        # Add iteration to storage
+        db_pokemon.append(pokemon)
+
+    return db_pokemon

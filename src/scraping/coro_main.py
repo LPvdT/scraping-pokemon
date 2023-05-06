@@ -23,6 +23,8 @@ async def main_coroutine(
     # Get Pokédex URLs
     urls_pokedex: List[str] = await get_pokedex_urls(page)
 
+    await utils.save_json(urls_pokedex, "data_urls_pokedex")
+
     # Get generation URLs
     data_generation_urls = await get_generation_urls(page, urls_pokedex)
 
