@@ -12,39 +12,50 @@ from src.db import db
 class BaseModel(Model):
     class Meta:
         database = db
+        schema = "pokemon"
 
 
 class GenerationUrl(BaseModel):
     generation_id = AutoField()
-    url = TextField(null=False, unique=True)
+
+    url = TextField()
 
 
 class PokedexUrl(BaseModel):
     pokedex_id = AutoField()
-    url = TextField(null=False, unique=True)
+
+    url = TextField()
 
 
 class CardsData(BaseModel):
     cards_data_id = AutoField()
+
     number = TextField()
     types = TextField()
 
 
 class CardsImg(BaseModel):
     cards_img_id = AutoField()
+
     url = TextField()
     img_url = TextField()
     img_alt = TextField()
 
 
 class PokemonBase(BaseModel):
+    """Contains Base Pokémon description."""
+
     pokemon_base_id = AutoField()
+
     pokemon_key = TextField()
     pokemon_description = TextField()
 
 
 class PokemonPokedex(BaseModel):
+    """Contains Pokédex data."""
+
     pokemon_pokedex_id = AutoField()
+
     national_no = TextField()
     types = TextField()
     species = TextField()
@@ -57,6 +68,8 @@ class PokemonPokedex(BaseModel):
 
 
 class PokemonTraining(BaseModel):
+    """Contains training data."""
+
     pokemon_training_id = AutoField()
 
     ev_yield = TextField()
@@ -69,6 +82,8 @@ class PokemonTraining(BaseModel):
 
 
 class PokemonBreeding(BaseModel):
+    """Contains breeding data."""
+
     pokemon_breeding_id = AutoField()
 
     egg_groups = TextField()
@@ -79,6 +94,8 @@ class PokemonBreeding(BaseModel):
 
 
 class PokemonBaseStats(BaseModel):
+    """Contains stats data."""
+
     pokemon_base_stats_id = AutoField()
 
     hp_base = IntegerField()
@@ -109,6 +126,8 @@ class PokemonBaseStats(BaseModel):
 
 
 class PokemonEntry(BaseModel):
+    """Contains Pokédex entry description."""
+
     pokemon_entry_id = AutoField()
 
     game = TextField()
@@ -118,6 +137,8 @@ class PokemonEntry(BaseModel):
 
 
 class PokemonLocation(BaseModel):
+    """Contains location info on where to find the Pokémon."""
+
     pokemon_location_id = AutoField()
 
     game = TextField()
@@ -127,6 +148,8 @@ class PokemonLocation(BaseModel):
 
 
 class PokemonLanguages(BaseModel):
+    """Contains different names for Pokémon in other languages."""
+
     pokemon_language_id = AutoField()
 
     language = TextField()
