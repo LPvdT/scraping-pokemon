@@ -4,7 +4,7 @@ from unicodedata import normalize
 from playwright.async_api import Locator, Page
 
 import src.utils as utils
-from src.db import table_pokemon
+from src.database.db import table_pokemon
 from src.environ import SCREENSHOT_PAGE
 
 
