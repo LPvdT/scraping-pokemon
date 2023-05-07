@@ -17,6 +17,10 @@ LIMIT_POKEDEX: int = 1
 LIMIT_CARDS: int = 5
 SCREENSHOT_PAGE: bool = False
 
+# DB
+CREATE: bool = True
+TRUNCATE: bool = False
+
 # URL
 URL_ROOT = "https://pokemondb.net"
 URL_POKEDEX_INDEX = "pokedex"
