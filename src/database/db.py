@@ -11,6 +11,10 @@ db = TinyDB(
     storage=BetterJSONStorage,
 )
 
+table_pokedex = db.table("pokedex")
+table_generations = db.table("generations")
+table_cards_data = db.table("cards_data")
+table_cards_img = db.table("cards_img")
 table_pokemon = db.table("pokemon")
 
 if TRUNCATE:
