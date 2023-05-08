@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 from playwright.async_api import Locator, expect
 
 import src.utils as utils
+from src.database.db import AsyncDatabaseInterFace
 from src.environ import CONSOLE, LIMIT_CARDS, LIMIT_POKEDEX, URL_ROOT
 
 
@@ -98,8 +99,16 @@ async def get_pokedex_cards(
             db_card_data["number"].append(number)
             db_card_data["types"].append(types)
 
-            # Append to db
+            # Append to storage
             db_pokedex_card_image.append(db_card_image)
             db_pokedex_card_data.append(db_card_data)
+
+            # Insert into database
+            await AsyncDatabaseInterFace.insert(
+                "cards_img", db_card_image
+            )
+            await AsyncDatabaseInterFace.insert(
+                "cards_data", db_card_data
+            )
 
     return db_pokedex_card_image, db_pokedex_card_data

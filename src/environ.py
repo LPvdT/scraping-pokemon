@@ -14,7 +14,7 @@ FIREFOX_PARAMS = FirefoxParams(
 # Switches
 KEEP_ALIVE: bool = False
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 5
+LIMIT_CARDS: int = 10
 SCREENSHOT_PAGE: bool = False
 
 # URL

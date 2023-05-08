@@ -5,6 +5,7 @@ from unicodedata import normalize
 from playwright.async_api import Browser, Locator
 
 import src.utils as utils
+from src.database.db import AsyncDatabaseInterFace
 from src.environ import SCREENSHOT_PAGE
 
 
@@ -367,5 +368,10 @@ async def scrape(
         "other_languages": db_other_languages,
     }
 
+    # Add iteration to NOSQL database
+    await AsyncDatabaseInterFace.insert("pokemon", pokemon)
+
     for key, value in data.items():
         db[key] = db[key].extend(value)
+
+    return db_pokemon
