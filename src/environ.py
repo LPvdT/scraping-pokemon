@@ -6,13 +6,13 @@ from rich.console import Console
 from src.types import FirefoxParams
 
 # Setup
-CONSOLE = Console(record=True, tab_size=4)
+CONSOLE = Console(record=True, tab_size=2)
 FIREFOX_PARAMS = FirefoxParams(
     headless=False,
 )
 
 # Switches
-KEEP_ALIVE: bool = False
+KEEP_ALIVE: bool = True
 LIMIT_POKEDEX: int = 1
 LIMIT_CARDS: int = 0
 SCREENSHOT_PAGE: bool = False
