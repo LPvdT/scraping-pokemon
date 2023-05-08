@@ -1,8 +1,15 @@
+from pathlib import Path
+
+from BetterJSONStorage import BetterJSONStorage
 from tinydb import TinyDB
 
-from src.environ import TRUNCATE, CONSOLE
+from src.environ import CONSOLE, TRUNCATE
 
-db = TinyDB("./data/db/nosql.db")
+db = TinyDB(
+    Path("./data/db/nosql.db"),
+    access_mode="r+",
+    storage=BetterJSONStorage,
+)
 
 table_pokemon = db.table("pokemon")
 
