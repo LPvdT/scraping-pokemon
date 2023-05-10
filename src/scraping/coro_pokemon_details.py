@@ -4,6 +4,7 @@ from unicodedata import normalize
 from playwright.async_api import Locator, Page
 
 import src.utils as utils
+from src.database.db import table_pokemon
 from src.environ import SCREENSHOT_PAGE
 
 
@@ -12,7 +13,10 @@ async def get_pokemon_details(
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
     db_pokemon: List[dict] = list()
 
-    for url_pokemon in [card["url"] for card in data_pokedex_cards_img]:
+    for url_pokemon, url_img_src in zip(
+        [card["url"] for card in data_pokedex_cards_img],
+        [card["img_src"] for card in data_pokedex_cards_img],
+    ):
         # Container
         pokemon = dict(
             key=...,
@@ -365,7 +369,13 @@ async def get_pokemon_details(
         pokemon["where_to_find"] = db_where_to_find
         pokemon["other_languages"] = db_other_languages
 
+        # Fetch images
+        await utils.save_img(url=url_img_src[0])
+
         # Add iteration to storage
         db_pokemon.append(pokemon)
+
+        # Add iteration to NOSQL database
+        table_pokemon.insert(pokemon)
 
     return db_pokemon

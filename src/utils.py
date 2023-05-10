@@ -1,6 +1,7 @@
 import asyncio
 import json
 from hashlib import sha1, sha256
+from pathlib import Path
 from sys import stdin
 from typing import (
     Any,
@@ -13,6 +14,7 @@ from typing import (
 )
 
 import aiofiles
+import aiohttp
 from playwright.async_api import (
     Browser,
     Locator,
@@ -23,6 +25,17 @@ from rich.console import Console
 
 import src.environ as environ
 import src.scraping as scraping
+
+
+async def save_img(url: str) -> Coroutine[Any, Any, None]:
+    filename = f"./data/static/img/pokemon/{Path(url).stem.title()}{Path(url).suffix}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as res:
+            if res.status == 200:
+                payload = await res.read()
+                async with aiofiles.open(filename, "wb+") as f:
+                    await f.write(payload)
 
 
 async def generate_hash(
@@ -59,7 +72,7 @@ async def save_screenshot(
 
     await element.screenshot(
         type=img_type,
-        path=f"./data/static/img/{filename}.{img_type}",
+        path=f"./data/static/img/screenshots/{filename}.{img_type}",
         full_page=full_page,
     )
 
@@ -112,6 +125,8 @@ async def navigate(
     # Log
     environ.CONSOLE.rule("[bold]Page title")
     environ.CONSOLE.log(await page.title())
+
+    page.set_default_timeout(environ.PAGE_TIMEOUT)
 
     return page
 
