@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 
 from playwright.async_api import Locator, Page, expect
 
+from src.database.db import table_pokedex
 from src.environ import URL_ROOT
 
 
@@ -28,6 +29,10 @@ async def get_pokedex_urls(
         pokedex: str = urljoin(
             URL_ROOT, await li.get_by_role("link").get_attribute("href")
         )
+        # Add to storage
         db_urls_pokedex.append(pokedex)
+
+        # Insert into db
+        table_pokedex.insert(dict(pokedex_url=pokedex))
 
     return db_urls_pokedex

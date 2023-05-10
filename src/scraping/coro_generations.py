@@ -3,6 +3,8 @@ from urllib.parse import urljoin
 
 from playwright.async_api import Locator, Page, expect
 
+from src.database.db import table_generations
+
 
 async def get_generation_urls(
     page: Page, urls_pokedex: List[str]
@@ -21,6 +23,12 @@ async def get_generation_urls(
     # Extract and compile URLs
     for a in await locator_links.all():
         href: str | None = await a.get_attribute("href")
-        db_urls_generations.append(urljoin(urls_pokedex[0], href))
+        record = urljoin(urls_pokedex[0], href)
+
+        # Add to storage
+        db_urls_generations.append(record)
+
+        # Insert into db
+        table_generations.insert(dict(generation_url=record))
 
     return db_urls_generations
