@@ -6,16 +6,20 @@ from rich.console import Console
 from src.types import FirefoxParams
 
 # Setup
-CONSOLE = Console(record=True, tab_size=4)
+CONSOLE = Console(record=True, tab_size=2)
 FIREFOX_PARAMS = FirefoxParams(
-    headless=False,
+    headless=True,
 )
 
 # Switches
 KEEP_ALIVE: bool = False
+PAGE_TIMEOUT: int = 5000
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 5
+LIMIT_CARDS: int = 0
 SCREENSHOT_PAGE: bool = False
+
+# DB
+TRUNCATE: bool = False
 
 # URL
 URL_ROOT = "https://pokemondb.net"
@@ -24,9 +28,11 @@ ENTRYPOINT = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
 
 # Structure
 FOLDERS: list[str] = [
-    "data/static/img",
+    "data/static/img/screenshots",
+    "data/static/img/pokemon",
     "data/static/logs",
     "data/static/out",
+    "data/db",
 ]
 
 
