@@ -8,13 +8,14 @@ from src.types import FirefoxParams
 # Setup
 CONSOLE = Console(record=True, tab_size=2)
 FIREFOX_PARAMS = FirefoxParams(
-    headless=False,
+    headless=True,
 )
 
 # Switches
 KEEP_ALIVE: bool = False
+PAGE_TIMEOUT: int = 5000
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 10
+LIMIT_CARDS: int = 0
 SCREENSHOT_PAGE: bool = False
 
 # DB
@@ -27,7 +28,8 @@ ENTRYPOINT = urljoin(URL_ROOT, URL_POKEDEX_INDEX)
 
 # Structure
 FOLDERS: list[str] = [
-    "data/static/img",
+    "data/static/img/screenshots",
+    "data/static/img/pokemon",
     "data/static/logs",
     "data/static/out",
     "data/db",
