@@ -12,9 +12,9 @@ FIREFOX_PARAMS = FirefoxParams(
 )
 
 # Switches
-KEEP_ALIVE: bool = True
+KEEP_ALIVE: bool = False
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 0
+LIMIT_CARDS: int = 10
 SCREENSHOT_PAGE: bool = False
 
 # DB
