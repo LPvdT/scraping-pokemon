@@ -1,6 +1,6 @@
 from rich.traceback import install
 
-from src.environ import CONSOLE, create_env
+from .environ import CONSOLE, create_env
 
 # Create/assert folder structure
 create_env()

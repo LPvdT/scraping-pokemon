@@ -3,9 +3,10 @@ from unicodedata import normalize
 
 from playwright.async_api import Locator, Page
 
-import src.utils as utils
-from src.database.db import table_pokemon
-from src.environ import SCREENSHOT_PAGE
+import scraping_pokemon.src.utils as utils
+
+from ..database.db import table_pokemon
+from ..environ import SCREENSHOT_PAGE
 
 
 async def get_pokemon_details(
