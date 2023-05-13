@@ -8,14 +8,14 @@ from src.types import FirefoxParams
 # Setup
 CONSOLE = Console(record=True, tab_size=2)
 FIREFOX_PARAMS = FirefoxParams(
-    headless=True,
+    headless=False,
 )
 
 # Switches
 KEEP_ALIVE: bool = False
 PAGE_TIMEOUT: int = 5000
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 0
+LIMIT_CARDS: int = 10
 SCREENSHOT_PAGE: bool = False
 
 # DB

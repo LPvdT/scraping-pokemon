@@ -2,10 +2,15 @@ from src.database.db import db
 import pandas as pd
 from tinydb import Query
 
-pokemon = Query()
 
-res = db.table("pokemon").all()
+def run() -> None:
+    pokemon = Query()
 
-pd.json_normalize(res)
+    res = db.table("pokemon").all()
 
-db.table("cards_img").all()
+    print(len(res))
+    # pd.json_normalize(res)
+
+    res_cards = db.table("cards_img").all()
+
+    print(len(res_cards))
