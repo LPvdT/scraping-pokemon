@@ -4,6 +4,20 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 # Todo
 
+## Poetry Bash scripts
+
+Think of something elegant for the following:
+
+- [ ] First run
+  - `poetry install`
+  - `poetry run playwright install firefox`
+
+- [ ] Scrape
+  - `poetry run scrape`
+
+- [ ] Query
+  - `poetry run query`
+
 ## Docstrings
 
 - [ ] Write docstrings for all classes, functions, etc.
