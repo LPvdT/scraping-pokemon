@@ -23,8 +23,8 @@ from playwright.async_api import (
 )
 from rich.console import Console
 
-import src.environ as environ
-import src.scraping as scraping
+import scraping_pokemon.src.environ as environ
+import scraping_pokemon.src.scraping as scraping
 
 
 async def save_img(url: str) -> Coroutine[Any, Any, None]:

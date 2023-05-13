@@ -3,12 +3,12 @@ from urllib.parse import urljoin
 
 from rich.console import Console
 
-from src.types import FirefoxParams
+from .types import FirefoxParams
 
 # Setup
 CONSOLE = Console(record=True, tab_size=2)
 FIREFOX_PARAMS = FirefoxParams(
-    headless=True,
+    headless=False,
 )
 
 # Switches

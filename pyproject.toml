@@ -1,0 +1,33 @@
+[tool.poetry]
+authors = ["Laurens van der Tas <laurens.vandertas@gmail.com>"]
+description = "Scraping Pokémon Database using the Playwright library combined with asynchronous Python."
+license = "MIT"
+name = "scraping-pokemon"
+packages = [{include = "scraping_pokemon"}]
+readme = "scraping_pokemon/docs/README.md"
+repository = "https://github.com/LPvdT/scraping-pokemon"
+version = "1.0.0"
+
+[tool.poetry.scripts]
+query = "scraping_pokemon.query:run"
+scrape = "scraping_pokemon.main:run"
+
+[tool.poetry.dependencies]
+aiofiles = "^23.1.0"
+aiohttp = "^3.8.4"
+asyncio = "^3.4.3"
+betterjsonstorage = "^1.3.1"
+pandas = "^2.0.1"
+playwright = "^1.33.0"
+python = "^3.10"
+rich = "^13.3.5"
+tinydb = "^4.7.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+flake8 = "^6.0.0"
+pytest = "^7.3.1"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
