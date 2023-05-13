@@ -1,11 +1,11 @@
 from typing import Any, Awaitable, Coroutine, List
 from unicodedata import normalize
 
+import src.utils as utils
 from playwright.async_api import Locator, Page
 
-import src.utils as utils
-from src.database.db import table_pokemon
-from src.environ import SCREENSHOT_PAGE
+from ..database.db import table_pokemon
+from ..environ import SCREENSHOT_PAGE
 
 
 async def get_pokemon_details(

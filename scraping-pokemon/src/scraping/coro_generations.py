@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 
 from playwright.async_api import Locator, Page, expect
 
-from src.database.db import table_generations
+from ..database.db import table_generations
 
 
 async def get_generation_urls(

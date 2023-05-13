@@ -1,11 +1,11 @@
 from typing import Any, Awaitable, Coroutine, List, Tuple
 from urllib.parse import urljoin
 
-from playwright.async_api import Locator, expect
-
 import src.utils as utils
-from src.database.db import table_cards_data, table_cards_img
+from playwright.async_api import Locator, expect
 from src.environ import CONSOLE, LIMIT_CARDS, LIMIT_POKEDEX, URL_ROOT
+
+from ..database.db import table_cards_data, table_cards_img
 
 
 async def get_pokedex_cards(

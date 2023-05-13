@@ -1,13 +1,13 @@
 from typing import Any, Awaitable, Coroutine, List
 
+import src.utils as utils
 from playwright.async_api import Browser, Page, Playwright
 
-import src.utils as utils
-from src.environ import CONSOLE, ENTRYPOINT, FIREFOX_PARAMS
-from src.scraping.coro_generations import get_generation_urls
-from src.scraping.coro_pokedex_cards import get_pokedex_cards
-from src.scraping.coro_pokedex_urls import get_pokedex_urls
-from src.scraping.coro_pokemon_details import get_pokemon_details
+from ..environ import CONSOLE, ENTRYPOINT, FIREFOX_PARAMS
+from .coro_generations import get_generation_urls
+from .coro_pokedex_cards import get_pokedex_cards
+from .coro_pokedex_urls import get_pokedex_urls
+from .coro_pokemon_details import get_pokemon_details
 
 
 async def main_coroutine(

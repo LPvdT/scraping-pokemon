@@ -3,7 +3,7 @@ from pathlib import Path
 from BetterJSONStorage import BetterJSONStorage
 from tinydb import TinyDB
 
-from src.environ import CONSOLE, TRUNCATE
+from ..environ import CONSOLE, TRUNCATE
 
 db = TinyDB(
     Path("./data/db/nosql.db"),
