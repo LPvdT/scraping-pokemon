@@ -4,13 +4,13 @@ description = "Scraping Pokémon Database using the Playwright library combined 
 license = "MIT"
 name = "scraping-pokemon"
 packages = [{include = "scraping-pokemon"}]
-readme = "scraping-pokemon/docs/README.md"
+readme = "scraping_pokemon/docs/README.md"
 repository = "https://github.com/LPvdT/scraping-pokemon"
 version = "0.1.0"
 
 [tool.poetry.scripts]
-entrypoint = "main:run"
-query = "query:run"
+entrypoint = "scraping_pokemon.main:run"
+query = "scraping_pokemon.query:run"
 
 [tool.poetry.dependencies]
 aiofiles = "^23.1.0"
