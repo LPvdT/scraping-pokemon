@@ -1,9 +1,15 @@
 from typing import Any, Awaitable, Coroutine, List, Tuple
 from urllib.parse import urljoin
 
-import src.utils as utils
 from playwright.async_api import Locator, expect
-from src.environ import CONSOLE, LIMIT_CARDS, LIMIT_POKEDEX, URL_ROOT
+
+import scraping_pokemon.src.utils as utils
+from scraping_pokemon.src.environ import (
+    CONSOLE,
+    LIMIT_CARDS,
+    LIMIT_POKEDEX,
+    URL_ROOT,
+)
 
 from ..database.db import table_cards_data, table_cards_img
 

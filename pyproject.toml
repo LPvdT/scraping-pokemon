@@ -9,8 +9,8 @@ repository = "https://github.com/LPvdT/scraping-pokemon"
 version = "0.1.0"
 
 [tool.poetry.scripts]
-entrypoint = "scraping_pokemon.main:run"
 query = "scraping_pokemon.query:run"
+scrape = "scraping_pokemon.main:run"
 
 [tool.poetry.dependencies]
 aiofiles = "^23.1.0"

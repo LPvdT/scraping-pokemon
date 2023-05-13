@@ -15,7 +15,7 @@ FIREFOX_PARAMS = FirefoxParams(
 KEEP_ALIVE: bool = False
 PAGE_TIMEOUT: int = 5000
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 10
+LIMIT_CARDS: int = 0
 SCREENSHOT_PAGE: bool = False
 
 # DB

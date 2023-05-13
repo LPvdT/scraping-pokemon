@@ -2,7 +2,8 @@ from typing import Any, Awaitable, Coroutine, List
 from urllib.parse import urljoin
 
 from playwright.async_api import Locator, Page, expect
-from src.environ import URL_ROOT
+
+from scraping_pokemon.src.environ import URL_ROOT
 
 from ..database.db import table_pokedex
 

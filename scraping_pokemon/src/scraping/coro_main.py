@@ -1,7 +1,8 @@
 from typing import Any, Awaitable, Coroutine, List
 
-import src.utils as utils
 from playwright.async_api import Browser, Page, Playwright
+
+import scraping_pokemon.src.utils as utils
 
 from ..environ import CONSOLE, ENTRYPOINT, FIREFOX_PARAMS
 from .coro_generations import get_generation_urls

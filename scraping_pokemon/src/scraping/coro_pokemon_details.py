@@ -1,8 +1,9 @@
 from typing import Any, Awaitable, Coroutine, List
 from unicodedata import normalize
 
-import src.utils as utils
 from playwright.async_api import Locator, Page
+
+import scraping_pokemon.src.utils as utils
 
 from ..database.db import table_pokemon
 from ..environ import SCREENSHOT_PAGE

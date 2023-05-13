@@ -15,8 +15,6 @@ from typing import (
 
 import aiofiles
 import aiohttp
-import src.environ as environ
-import src.scraping as scraping
 from playwright.async_api import (
     Browser,
     Locator,
@@ -24,6 +22,9 @@ from playwright.async_api import (
     async_playwright,
 )
 from rich.console import Console
+
+import scraping_pokemon.src.environ as environ
+import scraping_pokemon.src.scraping as scraping
 
 
 async def save_img(url: str) -> Coroutine[Any, Any, None]:
