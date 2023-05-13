@@ -4,6 +4,14 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 # Todo
 
+## Docstrings
+
+- [ ] Write docstrings for all classes, functions, etc.
+
+## Logging
+
+- [ ] Add logging calls to all operations to log in the console, and logging dumps.
+
 ## Pokédex detail page: `feature-scraper`
 
 > [Example *Bulbasaur*](https://pokemondb.net/pokedex/bulbasaur)
