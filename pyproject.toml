@@ -6,7 +6,7 @@ name = "scraping-pokemon"
 packages = [{include = "scraping_pokemon"}]
 readme = "scraping_pokemon/docs/README.md"
 repository = "https://github.com/LPvdT/scraping-pokemon"
-version = "0.1.0"
+version = "1.0.0"
 
 [tool.poetry.scripts]
 query = "scraping_pokemon.query:run"
