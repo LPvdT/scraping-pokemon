@@ -1,5 +1,5 @@
 __pycache__
-data/static
-data/logs
 dist/
 *.db
+scraping-pokemon/data/static
+scraping-pokemon/data/logs

@@ -3,8 +3,8 @@ authors = ["Laurens van der Tas <laurens.vandertas@gmail.com>"]
 description = "Scraping Pokémon Database using the Playwright library combined with asynchronous Python."
 license = "MIT"
 name = "scraping-pokemon"
-packages = [{include = "src"}]
-readme = "docs/README.md"
+packages = [{include = "scraping-pokemon"}]
+readme = "scraping-pokemon/docs/README.md"
 repository = "https://github.com/LPvdT/scraping-pokemon"
 version = "0.1.0"
 
