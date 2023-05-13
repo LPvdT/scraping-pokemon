@@ -1,6 +1,6 @@
 import asyncio
 
-from src.utils import entrypoint
+from .src.utils import entrypoint
 
 
 def run() -> None:
