@@ -53,6 +53,11 @@ async def get_pokedex_cards(
         card_img_data_all = await locator_card_img_data.all()
         card_data_all = await locator_card_data.all()
 
+        # Log
+        CONSOLE.log(
+            "Located all [b]card image data[/b] and [b]card data[/b]."
+        )
+
         # Card limit
         if LIMIT_CARDS > 0:
             card_img_data_all = card_img_data_all[:LIMIT_CARDS]
@@ -85,6 +90,11 @@ async def get_pokedex_cards(
                 "img"
             ).get_attribute("alt")
 
+            # Log
+            CONSOLE.log(
+                f"Extracted [b]card image data[/b] for: \t{url}"
+            )
+
             # Add to db
             db_card_image["url"].append(url)
             db_card_image["img_src"].append(img_src)
@@ -103,6 +113,11 @@ async def get_pokedex_cards(
 
             for t in await locator_types.all():
                 types.append(await t.inner_text())
+
+            # Log
+            CONSOLE.log(
+                f"Extracted [b]card data[/b] for: \t\t\t\t{url}"
+            )
 
             # Add to db
             db_card_data["number"].append(number)

@@ -1,5 +1,6 @@
 import asyncio
 import json
+from datetime import datetime
 from hashlib import sha1, sha256
 from pathlib import Path
 from sys import stdin
@@ -136,7 +137,7 @@ async def navigate(
         await page.goto(url)
 
     # Log
-    environ.CONSOLE.log(f"Navigating to: '{url}'...")
+    environ.CONSOLE.log(f"Navigating to: {url}")
 
     # Set page timeout
     page.set_default_timeout(environ.PAGE_TIMEOUT)
@@ -148,13 +149,15 @@ async def dump_console_recording(
     title: str, type: Literal["svg", "html"]
 ) -> Coroutine[Any, Any, Awaitable[None]]:
     params = dict(
-        path=f"./data/static/logs/{title}.svg",
+        path=f"./data/static/logs/{title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg",
         title=title.title(),
         clear=False,
     )
 
     # Log
-    environ.CONSOLE.log("Dumping console logs...")
+    environ.CONSOLE.log(
+        f"Dumping console logs: [b i]{type.upper()}[/b i] format..."
+    )
 
     if type == "svg":
         environ.CONSOLE.save_svg(**params)

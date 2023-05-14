@@ -24,7 +24,7 @@ Think of something elegant for the following:
 
 ## Logging
 
-- [ ] Add logging calls to all operations to log in the console, and logging dumps.
+- [x] Add logging calls to all operations to log in the console, and logging dumps.
 
 ## Pokédex detail page: `feature-scraper`
 
