@@ -29,7 +29,8 @@ import scraping_pokemon.src.scraping as scraping
 
 async def save_img(url: str) -> Coroutine[Any, Any, None]:
     """
-    Save an image, from a direct URL to the image, to disk. Image type is inferred from the URL.
+    Save an image, from a direct URL to the image, to disk. Image type is
+    inferred from the URL.
 
     Parameters
     ----------
@@ -173,7 +174,8 @@ async def save_json(
 
 def clean_text(text: str) -> str:
     """
-    Cleans the provided text from unicode weirdness. The provided text is assumed to have been processed by unicodedata.normalize first.
+    Cleans the provided text from unicode weirdness. The provided text is
+    assumed to have been processed by unicodedata.normalize first.
 
     Parameters
     ----------
@@ -246,7 +248,8 @@ async def dump_console_recording(
     title: str, type: Literal["svg", "html"]
 ) -> Coroutine[Any, Any, Awaitable[None]]:
     """
-    Dumps a recording of the internal rich console to vector (svg), or HTML format.
+    Dumps a recording of the internal rich console to vector (svg), or HTML
+    format.
 
     Parameters
     ----------
@@ -314,7 +317,7 @@ async def teardown(
 
 async def entrypoint() -> Coroutine[Any, Any, Awaitable[None]]:
     """
-    Main coroutine for the application
+    Playwright async API context manager entrypoint.
     """
 
     async with async_playwright() as backend:
