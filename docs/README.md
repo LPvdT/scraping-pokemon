@@ -4,13 +4,27 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 # Todo
 
+## Poetry Bash scripts
+
+Think of something elegant for the following:
+
+- [ ] First run
+  - `poetry install`
+  - `poetry run playwright install firefox`
+
+- [ ] Scrape
+  - `poetry run scrape`
+
+- [ ] Query
+  - `poetry run query`
+
 ## Docstrings
 
 - [ ] Write docstrings for all classes, functions, etc.
 
 ## Logging
 
-- [ ] Add logging calls to all operations to log in the console, and logging dumps.
+- [x] Add logging calls to all operations to log in the console, and logging dumps.
 
 ## Pokédex detail page: `feature-scraper`
 
@@ -35,7 +49,7 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 ## Relational database: `feature-db-sql`
 
-- [ ] Set up initial data models.
+- [x] Set up initial data models.
 - [ ] Finish and validate the data models.
 - [ ] Create CRUD methods in the classes.
 - [ ] Insert data into the models from the coroutines.

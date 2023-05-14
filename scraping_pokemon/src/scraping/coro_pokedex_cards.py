@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Coroutine, List, Tuple
 from urllib.parse import urljoin
 
-from playwright.async_api import Locator, expect
+from playwright.async_api import Locator, Page, expect
 
 import scraping_pokemon.src.utils as utils
 from scraping_pokemon.src.environ import (
@@ -15,8 +15,28 @@ from ..database.db import table_cards_data, table_cards_img
 
 
 async def get_pokedex_cards(
-    page, urls_pokedex
+    page: Page, urls_pokedex: List[str]
 ) -> Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]:
+    """
+    Coroutine for scraping Pokédex cards.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+    urls_pokedex : List[str]
+        List containing Pokédex target URLs.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]
+        Tuple containing two dictionaries for respectively the scraped Pokédex
+        card image data and Pokédex card data.
+    """
+
+    # Log
+    CONSOLE.log("Scraping [b]Pokédex cards[/b] data...")
+
     # Storage
     db_pokedex_card_image: List[dict] = list()
     db_pokedex_card_data: List[dict] = list()
@@ -50,6 +70,11 @@ async def get_pokedex_cards(
         card_img_data_all = await locator_card_img_data.all()
         card_data_all = await locator_card_data.all()
 
+        # Log
+        CONSOLE.log(
+            "Located all [b]card image data[/b] and [b]card data[/b]."
+        )
+
         # Card limit
         if LIMIT_CARDS > 0:
             card_img_data_all = card_img_data_all[:LIMIT_CARDS]
@@ -82,6 +107,11 @@ async def get_pokedex_cards(
                 "img"
             ).get_attribute("alt")
 
+            # Log
+            CONSOLE.log(
+                f"Extracted [b]card image data[/b] for: \t{url}"
+            )
+
             # Add to db
             db_card_image["url"].append(url)
             db_card_image["img_src"].append(img_src)
@@ -100,6 +130,11 @@ async def get_pokedex_cards(
 
             for t in await locator_types.all():
                 types.append(await t.inner_text())
+
+            # Log
+            CONSOLE.log(
+                f"Extracted [b]card data[/b] for: \t\t\t\t{url}"
+            )
 
             # Add to db
             db_card_data["number"].append(number)

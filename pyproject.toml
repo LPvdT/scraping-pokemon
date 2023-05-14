@@ -4,9 +4,9 @@ description = "Scraping Pokémon Database using the Playwright library combined 
 license = "MIT"
 name = "scraping-pokemon"
 packages = [{include = "scraping_pokemon"}]
-readme = "scraping_pokemon/docs/README.md"
+readme = "docs/README.md"
 repository = "https://github.com/LPvdT/scraping-pokemon"
-version = "1.0.0"
+version = "1.0.1"
 
 [tool.poetry.scripts]
 query = "scraping_pokemon.query:run"
@@ -26,6 +26,8 @@ tinydb = "^4.7.1"
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 flake8 = "^6.0.0"
+
+[tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
 
 [build-system]

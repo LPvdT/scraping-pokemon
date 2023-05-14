@@ -6,11 +6,29 @@ from playwright.async_api import Locator, Page, expect
 from scraping_pokemon.src.environ import URL_ROOT
 
 from ..database.db import table_pokedex
+from ..environ import CONSOLE
 
 
 async def get_pokedex_urls(
     page: Page,
 ) -> Coroutine[Any, Any, Awaitable[List[str]]]:
+    """
+    Coroutine for scraping the Pokédex URLs.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[List[str]]]
+        List containing scraped Pokédex URLs.
+    """
+
+    # Log
+    CONSOLE.log("Scraping [b]Pokédex URL[/b] data...")
+
     # Storage
     db_urls_pokedex: List[str] = list()
 

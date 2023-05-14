@@ -4,11 +4,31 @@ from urllib.parse import urljoin
 from playwright.async_api import Locator, Page, expect
 
 from ..database.db import table_generations
+from ..environ import CONSOLE
 
 
 async def get_generation_urls(
     page: Page, urls_pokedex: List[str]
 ) -> Coroutine[Any, Any, Awaitable[List[str]]]:
+    """
+    Coroutine for scraping the generation URLs.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+    urls_pokedex : List[str]
+        List containing Pokédex target URLs.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[List[str]]]
+        List containing generation URLs.
+    """
+
+    # Log
+    CONSOLE.log("Scraping [b]generation URL[/b] data...")
+
     # Storage
     db_urls_generations: List[str] = list()
 
