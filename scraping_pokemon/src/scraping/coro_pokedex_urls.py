@@ -12,6 +12,20 @@ from ..environ import CONSOLE
 async def get_pokedex_urls(
     page: Page,
 ) -> Coroutine[Any, Any, Awaitable[List[str]]]:
+    """
+    Coroutine for scraping the Pokédex URLs.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[List[str]]]
+        List containing scraped Pokédex URLs.
+    """
+
     # Log
     CONSOLE.log("Scraping [b]Pokédex URL[/b] data...")
 

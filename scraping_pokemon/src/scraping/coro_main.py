@@ -14,6 +14,15 @@ from .coro_pokemon_details import get_pokemon_details
 async def main_coroutine(
     backend: Playwright,
 ) -> Coroutine[Any, Any, Awaitable[None]]:
+    """
+    Main coroutine for the application.
+
+    Parameters
+    ----------
+    backend : Playwright
+        Playwright Async context
+    """
+
     # Launch browser and navigate
     CONSOLE.rule("[b]Browser & target[/b]")
     browser: Browser = await backend.firefox.launch(**FIREFOX_PARAMS)

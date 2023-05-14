@@ -10,6 +10,22 @@ from ..environ import CONSOLE
 async def get_generation_urls(
     page: Page, urls_pokedex: List[str]
 ) -> Coroutine[Any, Any, Awaitable[List[str]]]:
+    """
+    Coroutine for scraping the generation URLs.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+    urls_pokedex : List[str]
+        List containing Pokédex target URLs.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[List[str]]]
+        List containing generation URLs.
+    """
+
     # Log
     CONSOLE.log("Scraping [b]generation URL[/b] data...")
 
