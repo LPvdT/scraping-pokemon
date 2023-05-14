@@ -1,5 +1,6 @@
 import asyncio
 import json
+from datetime import datetime
 from hashlib import sha1, sha256
 from pathlib import Path
 from sys import stdin
@@ -21,7 +22,6 @@ from playwright.async_api import (
     Page,
     async_playwright,
 )
-from rich.console import Console
 
 import scraping_pokemon.src.environ as environ
 import scraping_pokemon.src.scraping as scraping
@@ -34,8 +34,14 @@ async def save_img(url: str) -> Coroutine[Any, Any, None]:
         async with session.get(url) as res:
             if res.status == 200:
                 payload = await res.read()
+
                 async with aiofiles.open(filename, "wb+") as f:
                     await f.write(payload)
+
+                    # Log
+                    environ.CONSOLE.log(
+                        f"Saved image: '{Path(url).stem.title()}{Path(url).suffix}'"
+                    )
 
 
 async def generate_hash(
@@ -76,6 +82,11 @@ async def save_screenshot(
         full_page=full_page,
     )
 
+    # Log
+    environ.CONSOLE.log(
+        f"Saved screenshot for '{filename}' page/element."
+    )
+
 
 async def save_json(
     obj: Any, filename: str, sort: bool = False
@@ -95,6 +106,9 @@ async def save_json(
                 obj, indent=2, sort_keys=sort, ensure_ascii=False
             )
         )
+
+        # Log
+        environ.CONSOLE.log(f"Created JSON dump for '{filename}'.")
 
 
 def clean_text(text: str) -> str:
@@ -123,27 +137,32 @@ async def navigate(
         await page.goto(url)
 
     # Log
-    environ.CONSOLE.rule("[bold]Page title")
-    environ.CONSOLE.log(await page.title())
+    environ.CONSOLE.log(f"Navigating to: {url}")
 
+    # Set page timeout
     page.set_default_timeout(environ.PAGE_TIMEOUT)
 
     return page
 
 
 async def dump_console_recording(
-    console: Console, title: str, type: Literal["svg", "html"]
+    title: str, type: Literal["svg", "html"]
 ) -> Coroutine[Any, Any, Awaitable[None]]:
     params = dict(
-        path=f"./data/static/logs/{title}.svg",
+        path=f"./data/static/logs/{title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg",
         title=title.title(),
         clear=False,
     )
 
+    # Log
+    environ.CONSOLE.log(
+        f"Dumping console logs: [b i]{type.upper()}[/b i] format..."
+    )
+
     if type == "svg":
-        console.save_svg(**params)
+        environ.CONSOLE.save_svg(**params)
     elif type == "html":
-        console.save_html(
+        environ.CONSOLE.save_html(
             path=params["path"].replace(".svg", ".html"),
             clear=params["clear"],
         )
@@ -154,6 +173,9 @@ async def dump_console_recording(
 async def teardown(
     browser: Browser,
 ) -> Coroutine[Any, Any, Awaitable[None]]:
+    # Log
+    environ.CONSOLE.log("Initiating browser teardown...")
+
     if environ.KEEP_ALIVE:
         environ.CONSOLE.log(">> Press CTRL-D to stop")
 
@@ -170,4 +192,7 @@ async def teardown(
 
 async def entrypoint() -> Coroutine[Any, Any, Awaitable[None]]:
     async with async_playwright() as backend:
+        # Log
+        environ.CONSOLE.log("Initiating async browser context...")
+
         await scraping.main_coroutine(backend)

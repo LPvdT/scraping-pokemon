@@ -24,7 +24,7 @@ Think of something elegant for the following:
 
 ## Logging
 
-- [ ] Add logging calls to all operations to log in the console, and logging dumps.
+- [x] Add logging calls to all operations to log in the console, and logging dumps.
 
 ## Pokédex detail page: `feature-scraper`
 
@@ -49,7 +49,7 @@ Think of something elegant for the following:
 
 ## Relational database: `feature-db-sql`
 
-- [ ] Set up initial data models.
+- [x] Set up initial data models.
 - [ ] Finish and validate the data models.
 - [ ] Create CRUD methods in the classes.
 - [ ] Insert data into the models from the coroutines.

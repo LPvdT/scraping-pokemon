@@ -15,7 +15,7 @@ FIREFOX_PARAMS = FirefoxParams(
 KEEP_ALIVE: bool = False
 PAGE_TIMEOUT: int = 5000
 LIMIT_POKEDEX: int = 1
-LIMIT_CARDS: int = 0
+LIMIT_CARDS: int = 5
 SCREENSHOT_PAGE: bool = False
 
 # DB
@@ -37,5 +37,8 @@ FOLDERS: list[str] = [
 
 
 def create_env() -> None:
+    CONSOLE.rule("[b]Project[/b]")
+    CONSOLE.log("Creating/asserting folder structure...")
+
     for folder in FOLDERS:
         Path(folder).mkdir(parents=True, exist_ok=True)

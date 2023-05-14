@@ -1,3 +1,4 @@
+from random import randint
 from typing import Any, Awaitable, Coroutine, List
 from unicodedata import normalize
 
@@ -6,12 +7,15 @@ from playwright.async_api import Locator, Page
 import scraping_pokemon.src.utils as utils
 
 from ..database.db import table_pokemon
-from ..environ import SCREENSHOT_PAGE
+from ..environ import CONSOLE, SCREENSHOT_PAGE
 
 
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
+    # Log
+    CONSOLE.log("Scraping [b]Pokémon details[/b] data...")
+
     db_pokemon: List[dict] = list()
 
     for url_pokemon, url_img_src in zip(
@@ -41,8 +45,11 @@ async def get_pokemon_details(
 
         name = normalize("NFKC", _name)
 
+        # Log
+        CONSOLE.log(f"Processing: [b]{name}[/b]...")
+
         # Screenshot page
-        if SCREENSHOT_PAGE:
+        if SCREENSHOT_PAGE or randint(1, 10) == 5:
             await utils.save_screenshot(
                 element=page,
                 filename=name,
@@ -378,5 +385,10 @@ async def get_pokemon_details(
 
         # Add iteration to NOSQL database
         table_pokemon.insert(pokemon)
+
+        # Log
+        CONSOLE.log(
+            f"[b]{name}[/b]: Persisted to storage and database."
+        )
 
     return db_pokemon
