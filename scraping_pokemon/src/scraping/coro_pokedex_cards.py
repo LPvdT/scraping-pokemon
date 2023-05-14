@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Coroutine, List, Tuple
 from urllib.parse import urljoin
 
-from playwright.async_api import Locator, expect
+from playwright.async_api import Locator, Page, expect
 
 import scraping_pokemon.src.utils as utils
 from scraping_pokemon.src.environ import (
@@ -15,8 +15,25 @@ from ..database.db import table_cards_data, table_cards_img
 
 
 async def get_pokedex_cards(
-    page, urls_pokedex
+    page: Page, urls_pokedex: List[str]
 ) -> Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]:
+    """
+    Coroutine for scraping Pokédex cards.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+    urls_pokedex : List[str]
+        List containing Pokédex target URLs.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]
+        Tuple containing two dictionaries for respectively the scraped Pokédex
+        card image data and Pokédex card data.
+    """
+
     # Log
     CONSOLE.log("Scraping [b]Pokédex cards[/b] data...")
 

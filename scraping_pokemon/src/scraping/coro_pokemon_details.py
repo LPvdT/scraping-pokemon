@@ -13,6 +13,22 @@ from ..environ import CONSOLE, SCREENSHOT_PAGE
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
+    """
+    Coroutine for scraping Pokémon details.
+
+    Parameters
+    ----------
+    page : Page
+        Playwright Page instance.
+    data_pokedex_cards_img : List[dict]
+        Scraped Pokédex card image data.
+
+    Returns
+    -------
+    Coroutine[Any, Any, Awaitable[dict]]
+        Scraped Pokémon details.
+    """
+
     # Log
     CONSOLE.log("Scraping [b]Pokémon details[/b] data...")
 

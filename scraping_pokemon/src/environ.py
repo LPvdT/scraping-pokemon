@@ -37,6 +37,10 @@ FOLDERS: list[str] = [
 
 
 def create_env() -> None:
+    """
+    Ensure all required directories are present/created.
+    """
+
     CONSOLE.rule("[b]Project[/b]")
     CONSOLE.log("Creating/asserting folder structure...")
 
