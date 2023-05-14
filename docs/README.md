@@ -8,19 +8,19 @@ Scraping [Pokémon Database](https://pokemondb.net/) using the *Playwright* libr
 
 Think of something elegant for the following:
 
-- [ ] First run
+- [x] First run
   - `poetry install`
   - `poetry run playwright install firefox`
 
-- [ ] Scrape
+- [x] Scrape
   - `poetry run scrape`
 
-- [ ] Query
+- [x] Query
   - `poetry run query`
 
 ## Docstrings
 
-- [ ] Write docstrings for all classes, functions, etc.
+- [x] Write docstrings for all classes, functions, etc.
 
 ## Logging
 
