@@ -37,5 +37,7 @@ FOLDERS: list[str] = [
 
 
 def create_env() -> None:
+    CONSOLE.log("Creating/asserting folder structure...")
+
     for folder in FOLDERS:
         Path(folder).mkdir(parents=True, exist_ok=True)
