@@ -20,7 +20,7 @@ Think of something elegant for the following:
 
 ## Docstrings
 
-- [ ] Write docstrings for all classes, functions, etc.
+- [x] Write docstrings for all classes, functions, etc.
 
 ## Logging
 
