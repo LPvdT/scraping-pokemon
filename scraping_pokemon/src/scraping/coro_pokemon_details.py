@@ -6,12 +6,15 @@ from playwright.async_api import Locator, Page
 import scraping_pokemon.src.utils as utils
 
 from ..database.db import table_pokemon
-from ..environ import SCREENSHOT_PAGE
+from ..environ import SCREENSHOT_PAGE, CONSOLE
 
 
 async def get_pokemon_details(
     page: Page, data_pokedex_cards_img: List[dict]
 ) -> Coroutine[Any, Any, Awaitable[dict]]:
+    # Log
+    CONSOLE.log("Scraping [b]Pokémon details[/b] data...")
+
     db_pokemon: List[dict] = list()
 
     for url_pokemon, url_img_src in zip(

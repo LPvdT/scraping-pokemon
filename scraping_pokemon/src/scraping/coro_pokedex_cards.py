@@ -17,6 +17,9 @@ from ..database.db import table_cards_data, table_cards_img
 async def get_pokedex_cards(
     page, urls_pokedex
 ) -> Coroutine[Any, Any, Awaitable[Tuple[List[dict], List[dict]]]]:
+    # Log
+    CONSOLE.log("Scraping [b]Pokédex cards[/b] data...")
+
     # Storage
     db_pokedex_card_image: List[dict] = list()
     db_pokedex_card_data: List[dict] = list()
